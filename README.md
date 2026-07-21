@@ -1,4 +1,4 @@
-# Al-Qur'an ABBS — Build APK Otomatis
+# Al-Qur'an Digital — Build APK Otomatis (v2)
 
 Aplikasi Al-Qur'an digital (IndoPak & Rasm Utsmani Madinah, offline penuh) yang
 di-build menjadi APK Android secara otomatis oleh GitHub Actions. Tidak perlu
