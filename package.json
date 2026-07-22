@@ -1,6 +1,6 @@
 {
   "name": "alquran-abbs",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "private": true,
   "description": "Al-Qur'an Digital v2 — IndoPak & Rasm Utsmani, offline penuh",
   "dependencies": {
