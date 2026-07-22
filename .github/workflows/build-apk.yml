@@ -45,18 +45,18 @@ jobs:
           ./gradlew assembleDebug
 
       - name: Rename APK
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk AlQuran-ABBS.apk
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk AlQuran.apk
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: AlQuran-ABBS-APK
-          path: AlQuran-ABBS.apk
+          name: AlQuran-APK
+          path: AlQuran.apk
 
       - name: Publish to Releases
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
-          name: "Al-Qur'an ABBS v2 - Build ${{ github.run_number }}"
+          name: "Al-Qur'an v2 - Build ${{ github.run_number }}"
           body: "APK otomatis dari GitHub Actions. Unduh file .apk di bawah, kirim ke HP, lalu instal."
-          files: AlQuran-ABBS.apk
+          files: AlQuran.apk

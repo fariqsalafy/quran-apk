@@ -4,7 +4,7 @@
 
 ### Perbaikan
 - Fix reading bar pos-bottom melayang di atas gesture navigation — ubah `bottom: env(safe-area-inset-bottom, 0)` → `bottom: 0`
-- App name konsisten "Al-Qur'an ABBS" di launcher & APK filename
+- App name konsisten "Al-Qur'an Digital" di launcher & APK filename (`AlQuran.apk`)
 
 ## v2.0.0 (Juli 2026)
 
