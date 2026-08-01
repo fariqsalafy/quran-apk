@@ -1,5 +1,16 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.3.3 (Agustus 2026)
+
+- **Desain hero jadwal shalat baru (Next Focus)**: waktu shalat berikutnya
+  ditampilkan besar (nama + countdown + jam + zona WIB/WITA/WIT) di panel
+  emas, 4 waktu lainnya sebagai grid kecil. Berdasarkan mockup varian C yang
+  disetujui (juga jadi referensi desain widget home screen ke depan).
+- **Fix bug countdown negatif** (sejak v3.3.0): logika pemilihan "waktu
+  berikutnya" salah — waktu yang sudah lewat bisa terpilih (countdown minus).
+  Kini hanya waktu yang belum lewat yang dipilih; malam hari otomatis
+  menampilkan "Subuh Besok".
+
 ## v3.3.2 (Agustus 2026)
 
 - **Jadwal offline = online 100% (selisih 0%)**: saat memilih kota (atau buka

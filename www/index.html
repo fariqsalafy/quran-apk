@@ -343,7 +343,7 @@
             letter-spacing: 1.5px; text-transform: uppercase; margin-top: 3px;
         }
 
-        /* Jadwal shalat card (menggantikan stats bar) */
+        /* Jadwal shalat card — DESAIN C (Next Focus) */
         #prayer-card { cursor: pointer; transition: background 0.2s; }
         #prayer-card:active { background: rgba(201,168,76,0.12); }
         .prayer-top {
@@ -358,32 +358,48 @@
             font-size: 0.62rem; color: rgba(255,255,255,0.5);
             white-space: nowrap; flex-shrink: 0;
         }
-        .prayer-grid {
-            display: grid; grid-template-columns: repeat(5, 1fr);
-            gap: 4px; padding: 4px 8px 6px;
+        .prayer-hero {
+            display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(140deg, rgba(201,168,76,0.28), rgba(201,168,76,0.08));
+            border: 1px solid rgba(201,168,76,0.45); border-radius: 11px;
+            padding: 8px 12px; margin: 4px 8px 6px;
         }
-        .prayer-item {
-            text-align: center; padding: 6px 2px 5px; border-radius: 9px;
-            background: rgba(0,0,0,0.15); border: 1px solid rgba(201,168,76,0.08);
+        .ph-label {
+            font-size: 0.55rem; letter-spacing: 1.8px; text-transform: uppercase;
+            color: var(--hero-gold);
         }
-        .prayer-item .p-name {
-            font-size: 0.58rem; color: rgba(255,255,255,0.6);
-            text-transform: uppercase; letter-spacing: 0.8px;
+        .ph-when {
+            font-size: 0.95rem; font-weight: 800; color: #f5ecd8; margin-top: 1px;
         }
-        .prayer-item .p-time {
-            font-size: 0.82rem; font-weight: 700; color: #f5ecd8; margin-top: 2px;
+        .ph-when b { color: var(--hero-gold); }
+        .ph-time {
+            font-size: 1.45rem; font-weight: 800; color: var(--hero-gold);
+            font-variant-numeric: tabular-nums; letter-spacing: 0.5px;
+        }
+        .ph-time small {
+            display: block; font-size: 0.48rem; color: rgba(255,255,255,0.5);
+            font-weight: 600; letter-spacing: 1.5px; text-align: right; margin-top: 1px;
+        }
+        .prayer-rest {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 4px; padding: 0 8px 7px;
+        }
+        .pr-cell {
+            text-align: center; padding: 5px 1px 4px; border-radius: 8px;
+            background: rgba(0,0,0,0.18); border: 1px solid rgba(201,168,76,0.07);
+        }
+        .pr-cell .n {
+            font-size: 0.5rem; letter-spacing: 0.6px; text-transform: uppercase;
+            color: rgba(255,255,255,0.55);
+        }
+        .pr-cell .t {
+            font-size: 0.68rem; font-weight: 700; color: #f5ecd8; margin-top: 1px;
             font-variant-numeric: tabular-nums;
         }
-        .prayer-item.next {
-            background: rgba(201,168,76,0.22);
-            border-color: rgba(201,168,76,0.55);
-        }
-        .prayer-item.next .p-time { color: var(--hero-gold); }
         .prayer-next {
-            text-align: center; padding: 2px 10px 9px;
-            font-size: 0.66rem; color: rgba(255,255,255,0.55);
+            text-align: center; padding: 0 10px 9px;
+            font-size: 0.6rem; color: rgba(255,255,255,0.5);
         }
-        .prayer-next b { color: var(--hero-gold); font-weight: 700; }
         .prayer-src {
             font-size: 0.58rem; color: rgba(255,255,255,0.35);
             margin-left: 6px; font-weight: 400;
@@ -3412,36 +3428,50 @@ function renderPrayer(){
     dt.textContent = fmtDate(new Date());
     var names = [['Subuh','subuh'],['Dzuhur','dzuhur'],['Ashar','ashar'],['Maghrib','maghrib'],['Isya','isya']];
     var now = new Date();
-    var nowMin = now.getHours()*60 + now.getMinutes();
-    var html = '', nextIdx = -1, nextMin = null;
+    var nowMin = (typeof __TEST_NOW_MIN__ !== 'undefined' && __TEST_NOW_MIN__ != null)
+        ? __TEST_NOW_MIN__ : now.getHours()*60 + now.getMinutes();
+    var nextIdx = -1, nextMin = null;
     for(var i=0;i<names.length;i++){
         var t = pState.times[names[i][1]];
         var tm = timeToMinutes(t);
-        if(nextMin === null || (tm > nowMin && tm < nextMin)){ nextMin = tm; nextIdx = i; }
+        // hanya waktu yang BELUM lewat; ambil yang paling dekat
+        if(tm > nowMin && (nextMin === null || tm < nextMin)){ nextMin = tm; nextIdx = i; }
     }
-    for(var i2=0;i2<names.length;i2++){
-        html += '<div class="prayer-item' + (i2===nextIdx ? ' next' : '') + '">'
-              + '<div class="p-name">' + names[i2][0] + '</div>'
-              + '<div class="p-time">' + pState.times[names[i2][1]] + '</div></div>';
-    }
-    grid.innerHTML = html;
-    // countdown
-    var locName = pState.cityName || (pState.mode==='auto' ? 'Lokasi GPS' : '');
-    var srcLabel = pState.source === 'CACHE' ? '· Kemenag (tersimpan)'
-                : pState.source === 'API' ? '· Kemenag API'
-                : '· Hisab Lokal';
-    if(nextMin === null){
+    var isBesok = false, tmrSubuh = null;
+    if(nextIdx === -1){
         // semua waktu sudah lewat -> besok subuh
-        var tmr = computeHisab(new Date(now.getTime()+86400000), pState.lat, pState.lng);
-        var tmrSubuh = timeToMinutes(tmr.subuh);
-        var sisa = (24*60 - nowMin) + tmrSubuh;
-        next.innerHTML = '⏰ <b>Subuh besok</b> ' + tmr.subuh + ' — dalam ' + durText(sisa) + ' <span class="prayer-src">' + srcLabel + '</span>';
-    } else {
-        var sisa2 = nextMin - nowMin;
-        var nm = names[nextIdx][0];
-        next.innerHTML = '⏰ <b>' + nm + '</b> ' + pState.times[names[nextIdx][1]] + ' — dalam ' + durText(sisa2) + ' <span class="prayer-src">' + srcLabel + '</span>';
+        isBesok = true;
+        tmrSubuh = computeHisab(new Date(now.getTime()+86400000), pState.lat, pState.lng).subuh;
+        nextIdx = 0;
+        nextMin = timeToMinutes(tmrSubuh) + 24*60;
     }
+    var sisa = nextMin - nowMin;
+    var srcLabel = pState.source === 'CACHE' ? 'Kemenag (tersimpan)'
+                : pState.source === 'API' ? 'Kemenag API'
+                : 'Hisab Lokal';
+    var tzLabel = (pState.lng || 110) < 115 ? 'WIB' : ((pState.lng || 110) < 125 ? 'WITA' : 'WIT');
+    var nextTime = isBesok ? tmrSubuh : pState.times[names[nextIdx][1]];
+    var html = '';
+    // hero: waktu berikutnya (fokus besar)
+    html += '<div class="prayer-hero">'
+          +   '<div class="ph-info">'
+          +     '<div class="ph-label">' + (isBesok ? 'Subuh Besok' : 'Berikutnya') + '</div>'
+          +     '<div class="ph-when">' + names[nextIdx][0] + ' · <b>' + durText(sisa) + ' lagi</b></div>'
+          +   '</div>'
+          +   '<div class="ph-time">' + nextTime + '<small>' + tzLabel + '</small></div>'
+          + '</div>';
+    // 4 waktu lainnya (kecil)
+    html += '<div class="prayer-rest">';
+    for(var i2=0;i2<names.length;i2++){
+        if(i2 === nextIdx) continue;
+        var t2 = (isBesok && names[i2][1] === 'subuh') ? tmrSubuh : pState.times[names[i2][1]];
+        html += '<div class="pr-cell"><div class="n">' + names[i2][0] + '</div><div class="t">' + t2 + '</div></div>';
+    }
+    html += '</div>';
+    grid.innerHTML = html;
+    var locName = pState.cityName || (pState.mode==='auto' ? 'Lokasi GPS' : '');
     loc.innerHTML = '🕌 ' + (locName || 'Jadwal Shalat');
+    next.innerHTML = 'Metode Kemenag RI · ' + srcLabel;
 }
 function durText(min){
     if(min < 60) return min + ' mnt';
