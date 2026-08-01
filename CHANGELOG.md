@@ -1,5 +1,11 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.3.5 (Agustus 2026)
+
+- **Fix hero jadwal tidak full-width**: `.hero-stats` masih `display: flex`
+  (sisa desain stats bar 4 kolom) sehingga kartu menyusut ke lebar isi. Diubah
+  ke `display: block; width: 100%` — kartu kini selebar hero.
+
 ## v3.3.4 (Agustus 2026)
 
 - **Hero jadwal shalat dibersihkan**: baris lokasi/tanggal di atas dan teks
