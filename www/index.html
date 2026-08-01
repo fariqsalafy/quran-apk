@@ -92,44 +92,6 @@
             --radius: 16px;
         }
 
-        /* Dark mode auto */
-        @media (prefers-color-scheme: dark) {
-            :root:not([data-theme="light"]):not([data-theme="mushaf"]):not([data-theme="dark"]) {
-                --bg:           #0d1a1a;
-                --bg-card:      #112222;
-                --bg-elevated:  #163030;
-                --bg-deep:      #060f0f;
-
-                --teal:         #2a8080;
-                --teal-mid:     #339999;
-                --teal-light:   #44bbbb;
-                --teal-dim:     rgba(42,128,128,0.12);
-
-                --gold:         #c9a84c;
-                --gold-bright:  #e0c070;
-                --gold-light:   #f0d890;
-                --gold-dim:     rgba(201,168,76,0.12);
-                --gold-border:  rgba(201,168,76,0.28);
-                --hero-gold:    #f0cc60;
-                --hero-gold-sub:#c9a84c;
-                --ruled-color:  rgba(201,168,76,0.14);
-
-                --text:         #f0e8d8;
-                --text-mid:     #d8cdb8;
-                --text-sub:     rgba(240,232,216,0.5);
-                --border:       rgba(201,168,76,0.15);
-                --shadow:       rgba(0,0,0,0.4);
-
-                --bar-bg:       rgba(13,26,26,0.96);
-                --bg-color:     #0d1a1a;
-                --text-color:   #f0e8d8;
-                --accent-color: #c9a84c;
-                --sub-text-color: rgba(240,232,216,0.5);
-                --waqaf-color:  #ff6b6b;
-                --active-ayah:  #64b5f6;
-                --active-ayah-bg: rgba(100,181,246,0.14);
-            }
-        }
         [data-theme="dark"] {
             --bg: #0d1a1a !important; --bg-card: #112222 !important;
             --bg-elevated: #163030 !important; --bg-deep: #060f0f !important;
@@ -1551,7 +1513,7 @@
         });
 
         function loadConfig(){
-            const saved = localStorage.getItem('quranProConfig_v5');
+            const saved = localStorage.getItem('quranProConfig_v6');
             if(saved) userConfig = {...userConfig, ...JSON.parse(saved)};
             // Sync data-theme from saved bgColor
             { const _bg = userConfig.bgColor;
@@ -1567,7 +1529,7 @@
             applyConfig();
         }
 
-        function saveData(){ localStorage.setItem('quranProConfig_v5', JSON.stringify(userConfig)); }
+        function saveData(){ localStorage.setItem('quranProConfig_v6', JSON.stringify(userConfig)); }
         function getApiEdition() { return userConfig.mode; }
 
         function populateFontDropdown() {
@@ -2682,35 +2644,7 @@
         // FITUR BARU V4
         // =============================================
 
-        // --- 1. MODE MALAM OTOMATIS (ikut sistem) ---
-        function initAutoTheme() {
-            // App default: LIGHT. Follow system, respect manual override.
-            const saved = localStorage.getItem('quranProConfig_v5');
-            const hasManual = saved && JSON.parse(saved)._manualTheme;
-            if (!hasManual) {
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                if (prefersDark) {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                    userConfig.bgColor = '#0d1a1a'; userConfig.textColor = '#ede5d5';
-                } else {
-                    document.documentElement.setAttribute('data-theme', 'light');
-                    userConfig.bgColor = '#ffffff'; userConfig.textColor = '#1a1208';
-                }
-                applyConfig();
-            }
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-                if (localStorage.getItem('quranProConfig_v5') &&
-                    JSON.parse(localStorage.getItem('quranProConfig_v5'))._manualTheme) return;
-                if (e.matches) {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                    userConfig.bgColor = '#0d1a1a'; userConfig.textColor = '#ede5d5';
-                } else {
-                    document.documentElement.setAttribute('data-theme', 'light');
-                    userConfig.bgColor = '#ffffff'; userConfig.textColor = '#1a1208';
-                }
-                applyConfig();
-            });
-        }
+        // --- (Auto-theme dihapus: tema selalu ikut pilihan user, default mushaf) ---
 
         function applyTheme(bg, tx) {
             userConfig._manualTheme = true;
@@ -3001,10 +2935,7 @@
             setTimeout(() => scrollToAyah(s, a, {center: true, highlight: true}), 250);
         }
 
-        // --- INIT SEMUA FITUR BARU SAAT LOAD ---
-        window.addEventListener('load', () => {
-            initAutoTheme();
-        });
+        // --- INIT SAAT LOAD (auto-theme dihapus: tema dari config/default) ---
 
         // --- IMPROVED AUDIO LOGIC (CONTROL BAR & TOGGLE) ---
         let currentPlaying = null;

@@ -1,5 +1,14 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.2.1 (Agustus 2026)
+
+- **Fix: tema selalu gelap/putih meski default mushaf.** Penyebab: fitur
+  "Mode Malam Otomatis" (ikut prefers-color-scheme sistem) menimpa tema default
+  saat aplikasi dibuka. Auto-theme dihapus total (fungsi + CSS media query +
+  listener). Tema kini selalu mengikuti pilihan user / default mushaf.
+- Key config dinaikkan `quranProConfig_v5` -> `v6` agar config lama yang
+  terkontaminasi tema gelap tidak terbawa.
+
 ## v3.2.0 (Agustus 2026)
 
 - **Default baru**: tema Mushaf (krem), garis mushaf NON-aktif, ukuran teks 70px.
