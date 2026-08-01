@@ -1,5 +1,16 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.3.2 (Agustus 2026)
+
+- **Jadwal offline = online 100% (selisih 0%)**: saat memilih kota (atau buka
+  app dengan kota tersimpan), app mengunduh jadwal resmi Kemenag **12 bulan ke
+  depan** dari API dan menyimpannya di localStorage. Saat offline, jadwal
+  dibaca dari cache — datanya identik persis dengan online (bukan hisab
+  perkiraan). Hisab lokal tetap jadi cadangan terakhir hanya jika cache kosong
+  dan offline total.
+- Label sumber diperjelas: "Kemenag API" (online), "Kemenag (tersimpan)"
+  (offline dari cache), "Hisab Lokal" (cadangan).
+
 ## v3.3.1 (Agustus 2026)
 
 - **Fix krusial hisab offline**: normalisasi Right Ascension (0-360°) di

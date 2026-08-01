@@ -3249,6 +3249,40 @@ function savePrayerState(){
     try{ localStorage.setItem(PRAYER_STORE, JSON.stringify(pState)); }catch(e){}
 }
 
+/* ── CACHE JADWAL RESMI KEMENAG (offline = snapshot online, selisih 0%) ── */
+var PRAYER_CACHE_STORE = 'quranProPrayerCache_v1';
+function cacheLoad(){
+    try{ var s = localStorage.getItem(PRAYER_CACHE_STORE); return s ? JSON.parse(s) : {}; }
+    catch(e){ return {}; }
+}
+function cacheSave(c){
+    try{ localStorage.setItem(PRAYER_CACHE_STORE, JSON.stringify(c)); }catch(e){}
+}
+function cacheKey(cityId, y, m){ return cityId + '_' + y + '_' + m; }
+function cacheGetMonth(cityId, y, m){
+    var c = cacheLoad();
+    return c[cacheKey(cityId, y, m)] || null;
+}
+function cacheSetMonth(cityId, y, m, rows){
+    var c = cacheLoad();
+    c[cacheKey(cityId, y, m)] = rows;
+    cacheSave(c);
+}
+function findDayInRows(rows, date){
+    var day = date.getDate();
+    for(var i=0;i<rows.length;i++){
+        var mm = /(\d{2})\/(\d{2})\/(\d{4})/.exec(rows[i].tanggal);
+        if(mm && parseInt(mm[1],10) === day) return rows[i];
+    }
+    return rows[day-1] || null;
+}
+function rowsToTimes(row){
+    return {
+        subuh: row.subuh, terbit: row.terbit, dzuhur: row.dzuhur,
+        ashar: row.ashar, maghrib: row.maghrib, isya: row.isya
+    };
+}
+
 /* ── Hisab Kemenag RI ──────────────────────────────────────────
    Parameter: Subuh -20°, Isya -18°, Ashar bayangan 1x (faktor 1),
    Maghrib saat terbenam (0.833° + ihtiyat), Dzuhur zawal + ihtiyat 2 menit. */
@@ -3323,28 +3357,44 @@ function computeHisab(date, lat, lng){
 }
 
 /* ── API MyQuran (sumber jadwal Kemenag RI) ── */
-function fetchAPI(date, cityId){
-    var y = date.getFullYear(), m = date.getMonth() + 1;
+function fetchMonthAPI(cityId, y, m){
     var mm = (m < 10 ? '0' : '') + m;
     return fetch('https://api.myquran.com/v2/sholat/jadwal/' + cityId + '/' + y + '/' + mm, {mode:'cors'})
         .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
         .then(function(j){
             if(!j || !j.data || !j.data.jadwal) throw new Error('Data kosong');
-            var day = date.getDate();
-            // Format MyQuran: 'Sabtu, 15/08/2026' -> ekstrak DD
-            var row = null;
-            for(var i=0;i<j.data.jadwal.length;i++){
-                var m = /(\d{2})\/(\d{2})\/(\d{4})/.exec(j.data.jadwal[i].tanggal);
-                if(m && parseInt(m[1],10) === day){ row = j.data.jadwal[i]; break; }
-            }
-            if(!row) row = j.data.jadwal[day-1];
-            if(!row) throw new Error('Hari tidak ditemukan');
-            return {
-                subuh: row.subuh, terbit: row.terbit, dzuhur: row.dzuhur,
-                ashar: row.ashar, maghrib: row.maghrib, isya: row.isya,
-                lokasi: j.data.lokasi
-            };
+            return j.data.jadwal;
         });
+}
+/* Prefetch 12 bulan ke depan -> cache (offline = snapshot online, selisih 0%) */
+function prefetchPrayerYear(cityId){
+    var today = getToday();
+    var jobs = [];
+    for(var i=0;i<12;i++){
+        var d = new Date(today.getFullYear(), today.getMonth()+i, 1);
+        var y = d.getFullYear(), m = d.getMonth()+1;
+        if(!cacheGetMonth(cityId, y, m)) jobs.push([y, m]);
+    }
+    jobs.forEach(function(jm){
+        fetchMonthAPI(cityId, jm[0], jm[1]).then(function(rows){
+            cacheSetMonth(cityId, jm[0], jm[1], rows);
+        }).catch(function(){});
+    });
+}
+/* Ambil jadwal: cache dulu (0% selisih), baru API, terakhir hisab */
+function resolvePrayerDay(date, cityId){
+    var y = date.getFullYear(), m = date.getMonth()+1;
+    var rows = cacheGetMonth(cityId, y, m);
+    if(rows){
+        var row = findDayInRows(rows, date);
+        if(row) return Promise.resolve({times: rowsToTimes(row), src: 'CACHE'});
+    }
+    return fetchMonthAPI(cityId, y, m).then(function(rows){
+        cacheSetMonth(cityId, y, m, rows);
+        var row = findDayInRows(rows, date);
+        if(!row) throw new Error('Hari tidak ditemukan');
+        return {times: rowsToTimes(row), src: 'API'};
+    });
 }
 
 /* ── Render ── */
@@ -3377,7 +3427,9 @@ function renderPrayer(){
     grid.innerHTML = html;
     // countdown
     var locName = pState.cityName || (pState.mode==='auto' ? 'Lokasi GPS' : '');
-    var srcLabel = pState.source === 'API' ? '· Kemenag API' : '· Hisab Lokal';
+    var srcLabel = pState.source === 'CACHE' ? '· Kemenag (tersimpan)'
+                : pState.source === 'API' ? '· Kemenag API'
+                : '· Hisab Lokal';
     if(nextMin === null){
         // semua waktu sudah lewat -> besok subuh
         var tmr = computeHisab(new Date(now.getTime()+86400000), pState.lat, pState.lng);
@@ -3428,19 +3480,23 @@ function refreshPrayer(){
 function loadPrayer(lat, lng, cityId, key, status){
     var date = getToday();
     if(pState.mode === 'manual' && cityId){
-        // 1) coba API
-        fetchAPI(date, cityId).then(function(res){
-            pState.times = {subuh:res.subuh, terbit:res.terbit, dzuhur:res.dzuhur, ashar:res.ashar, maghrib:res.maghrib, isya:res.isya};
+        // Prefetch 12 bulan ke depan biar offline = online (selisih 0%)
+        prefetchPrayerYear(cityId);
+        // 1) cache → 2) API → 3) hisab lokal
+        resolvePrayerDay(date, cityId).then(function(res){
+            pState.times = res.times;
             pState.lat = lat; pState.lng = lng;
             pState.dateKey = key;
-            pState.source = 'API';
+            pState.source = res.src;   // 'CACHE' | 'API'
             savePrayerState();
             renderPrayer();
-            if(status) status.textContent = '✓ Sumber: Kemenag (API) — ' + (res.lokasi || pState.cityName);
+            if(status) status.textContent = res.src === 'CACHE'
+                ? '✓ Jadwal Kemenag (tersimpan/offline)'
+                : '✓ Sumber: Kemenag (API)';
             syncAdzanToggle();
             scheduleAdzan();
         }).catch(function(){
-            // 2) fallback hisab lokal
+            // 3) fallback hisab lokal
             hisabFallback(lat, lng, key, status);
         });
     } else {
@@ -3495,6 +3551,7 @@ function renderCityList(q){
             pState.cityId = c.id; pState.cityName = c.name;
             pState.lat = c.lat; pState.lng = c.lng;
             savePrayerState();
+            prefetchPrayerYear(c.id);   // unduh 12 bulan utk offline 0%
             refreshPrayer();
         };
         box.appendChild(div);
