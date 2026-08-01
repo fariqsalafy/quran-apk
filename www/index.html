@@ -346,23 +346,11 @@
         /* Jadwal shalat card — DESAIN C (Next Focus) */
         #prayer-card { cursor: pointer; transition: background 0.2s; }
         #prayer-card:active { background: rgba(201,168,76,0.12); }
-        .prayer-top {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 9px 12px 4px; gap: 8px;
-        }
-        .prayer-loc {
-            font-size: 0.72rem; font-weight: 600; color: var(--hero-gold);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .prayer-date {
-            font-size: 0.62rem; color: rgba(255,255,255,0.5);
-            white-space: nowrap; flex-shrink: 0;
-        }
         .prayer-hero {
             display: flex; justify-content: space-between; align-items: center;
             background: linear-gradient(140deg, rgba(201,168,76,0.28), rgba(201,168,76,0.08));
             border: 1px solid rgba(201,168,76,0.45); border-radius: 11px;
-            padding: 8px 12px; margin: 4px 8px 6px;
+            padding: 10px 13px; margin: 9px 9px 6px;
         }
         .ph-label {
             font-size: 0.55rem; letter-spacing: 1.8px; text-transform: uppercase;
@@ -382,7 +370,7 @@
         }
         .prayer-rest {
             display: grid; grid-template-columns: repeat(4, 1fr);
-            gap: 4px; padding: 0 8px 7px;
+            gap: 4px; padding: 0 9px 9px;
         }
         .pr-cell {
             text-align: center; padding: 5px 1px 4px; border-radius: 8px;
@@ -395,14 +383,6 @@
         .pr-cell .t {
             font-size: 0.68rem; font-weight: 700; color: #f5ecd8; margin-top: 1px;
             font-variant-numeric: tabular-nums;
-        }
-        .prayer-next {
-            text-align: center; padding: 0 10px 9px;
-            font-size: 0.6rem; color: rgba(255,255,255,0.5);
-        }
-        .prayer-src {
-            font-size: 0.58rem; color: rgba(255,255,255,0.35);
-            margin-left: 6px; font-weight: 400;
         }
 
         /* Last read resumption card */
@@ -1449,12 +1429,7 @@
 
                 <!-- Jadwal shalat (menggantikan stats bar) -->
                 <div class="hero-stats" id="prayer-card" onclick="openPrayerModal()">
-                    <div class="prayer-top">
-                        <div class="prayer-loc" id="prayer-loc">📍 Menentukan lokasi…</div>
-                        <div class="prayer-date" id="prayer-date"></div>
-                    </div>
                     <div class="prayer-grid" id="prayer-grid"></div>
-                    <div class="prayer-next" id="prayer-next"></div>
                 </div>
 
                 <!-- Last read resumption card -->
@@ -3414,18 +3389,9 @@ function resolvePrayerDay(date, cityId){
 }
 
 /* ── Render ── */
-function fmtDate(d){
-    var nama = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-    var bln = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-    return nama[d.getDay()] + ', ' + d.getDate() + ' ' + bln[d.getMonth()] + ' ' + d.getFullYear();
-}
 function renderPrayer(){
     var grid = document.getElementById('prayer-grid');
-    var next = document.getElementById('prayer-next');
-    var loc = document.getElementById('prayer-loc');
-    var dt = document.getElementById('prayer-date');
     if(!grid || !pState.times) return;
-    dt.textContent = fmtDate(new Date());
     var names = [['Subuh','subuh'],['Dzuhur','dzuhur'],['Ashar','ashar'],['Maghrib','maghrib'],['Isya','isya']];
     var now = new Date();
     var nowMin = (typeof __TEST_NOW_MIN__ !== 'undefined' && __TEST_NOW_MIN__ != null)
@@ -3446,9 +3412,6 @@ function renderPrayer(){
         nextMin = timeToMinutes(tmrSubuh) + 24*60;
     }
     var sisa = nextMin - nowMin;
-    var srcLabel = pState.source === 'CACHE' ? 'Kemenag (tersimpan)'
-                : pState.source === 'API' ? 'Kemenag API'
-                : 'Hisab Lokal';
     var tzLabel = (pState.lng || 110) < 115 ? 'WIB' : ((pState.lng || 110) < 125 ? 'WITA' : 'WIT');
     var nextTime = isBesok ? tmrSubuh : pState.times[names[nextIdx][1]];
     var html = '';
@@ -3469,9 +3432,6 @@ function renderPrayer(){
     }
     html += '</div>';
     grid.innerHTML = html;
-    var locName = pState.cityName || (pState.mode==='auto' ? 'Lokasi GPS' : '');
-    loc.innerHTML = '🕌 ' + (locName || 'Jadwal Shalat');
-    next.innerHTML = 'Metode Kemenag RI · ' + srcLabel;
 }
 function durText(min){
     if(min < 60) return min + ' mnt';

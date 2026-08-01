@@ -1,5 +1,11 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.3.4 (Agustus 2026)
+
+- **Hero jadwal shalat dibersihkan**: baris lokasi/tanggal di atas dan teks
+  "Metode Kemenag RI" di bawah dihapus — tampilan langsung panel jadwal
+  (Berikutnya + countdown + 4 waktu lain) persis mockup varian C.
+
 ## v3.3.3 (Agustus 2026)
 
 - **Desain hero jadwal shalat baru (Next Focus)**: waktu shalat berikutnya
