@@ -1,5 +1,15 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.2.2 (Agustus 2026)
+
+- **Fix: font default tidak 70.** Pinch handler lama memakai variabel
+  `currentFontSize` (baseline 28, tidak pernah disinkron dari config) dan
+  menyimpan 28 ke config saat sentuhan 2 jari. Handler duplikat itu dihapus;
+  kini hanya ada satu mekanisme pinch yang membaca font dari CSS var.
+- **Fitur baru: Kunci Ukuran Font** (`fontLock`, default ON). Saat aktif,
+  pinch/gesture tidak mengubah ukuran font sama sekali; slider manual di
+  Pengaturan tetap berfungsi. Toggle tersedia di Pengaturan.
+
 ## v3.2.1 (Agustus 2026)
 
 - **Fix: tema selalu gelap/putih meski default mushaf.** Penyebab: fitur

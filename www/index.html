@@ -1285,7 +1285,7 @@
                 <div class="setting-group"><div style="display:flex; justify-content:space-between;"><b>Posisi Garis</b><span id="ruledy-val" style="font-size:0.8rem; opacity:0.7;">30</span></div><input type="range" min="-10" max="45" value="30" id="ruledy-slider" oninput="setRuleDy(this.value)" style="width:100%; margin-top:8px; accent-color:var(--accent-color);"><div style="font-size:0.72rem; opacity:0.6; margin-top:2px;">Naik-turunkan garis mushaf terhadap huruf.</div><div class="radio-grid" style="margin-top:10px;"><div class="radio-btn selected" id="opt-rules-on" onclick="setShowRules(true)"><span style="font-size:0.8rem;">Garis Tampil</span></div><div class="radio-btn" id="opt-rules-off" onclick="setShowRules(false)"><span style="font-size:0.8rem;">Tanpa Garis</span></div></div></div>
                 <div class="setting-group"><b>Tanda Mushaf</b><div style="font-size:0.72rem; opacity:0.6; margin:4px 0 8px;">Tanda kecil (sifr, iqlab, waqaf) butuh font khusus. Jika muncul lingkaran hitam, pilih Sembunyikan.</div><div class="radio-grid"><div class="radio-btn selected" id="opt-marks-auto" onclick="setMarksMode('auto')"><span style="font-size:0.8rem;">Otomatis</span></div><div class="radio-btn" id="opt-marks-show" onclick="setMarksMode('show')"><span style="font-size:0.8rem;">Tampilkan</span></div><div class="radio-btn" id="opt-marks-hide" onclick="setMarksMode('hide')"><span style="font-size:0.8rem;">Sembunyikan</span></div></div></div>
                 <div class="setting-group"><div style="display:flex; justify-content:space-between; align-items:center;"><div><b>Bantuan Waqaf (Warna)</b><div style="font-size:0.8rem; opacity:0.7;">Merah (Berhenti), Hijau (Lanjut).</div></div><label class="switch"><input type="checkbox" id="waqaf-toggle" onchange="toggleWaqaf(this.checked)"><span class="slider"></span></label></div></div>
-                <div class="setting-group"><b>Ukuran Teks: <span id="font-disp">70px</span></b><input type="range" id="font-slider" min="20" max="120" value="70" style="width:100%; margin-top:10px;" oninput="updateFontPreview(this.value)"></div>
+                <div class="setting-group"><b>Ukuran Teks: <span id="font-disp">70px</span></b><input type="range" id="font-slider" min="20" max="120" value="70" style="width:100%; margin-top:10px;" oninput="updateFontPreview(this.value)"><div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;"><div><b>Kunci Ukuran Font</b><div style="font-size:0.72rem; opacity:0.7;">Cegah font berubah saat scroll/pinch. Slider di atas tetap bisa dipakai manual.</div></div><label class="switch"><input type="checkbox" id="font-lock-toggle" onchange="toggleFontLock(this.checked)"><span class="slider"></span></label></div></div>
                 <div class="setting-group"><b>Tema Tampilan</b>
                     <div class="theme-cards">
                         <div class="theme-card active" data-bg="#ffffff" onclick="applyTheme('#ffffff','#1a1208')">
@@ -1493,6 +1493,7 @@
             showRules: false,
             marksMode: 'auto',
             fontSize: 70,
+            fontLock: true,
             bgColor: '#f2e8c8',
             textColor: '#2a1800',
             showWaqaf: true,
@@ -1617,6 +1618,7 @@
             const elPos=document.getElementById('pos-'+userConfig.barPosition);if(elPos)elPos.classList.add('selected');
 
             const waqafSwitch=document.getElementById('waqaf-toggle');if(waqafSwitch)waqafSwitch.checked=userConfig.showWaqaf;
+            const fontLockSwitch=document.getElementById('font-lock-toggle');if(fontLockSwitch)fontLockSwitch.checked=userConfig.fontLock;
             const fs=document.getElementById('font-slider');if(fs)fs.value=parseInt(userConfig.fontSize);
             const fd=document.getElementById('font-disp');if(fd)fd.innerText=userConfig.fontSize+'px';
             const pb=document.getElementById('preview-box');if(pb)pb.style.fontSize=Math.min(userConfig.fontSize,38)+'px';
@@ -1682,6 +1684,7 @@
             saveData(); redrawAllRuledLines(); updatePreviewText();
         }
         function toggleWaqaf(v){ userConfig.showWaqaf=v; updateWaqafClasses(); updatePreviewText(); saveData(); }
+        function toggleFontLock(v){ userConfig.fontLock=v; saveData(); }
         function updateWaqafClasses(){ const el = document.getElementById('content-area'); if(el) { if(userConfig.showWaqaf) el.classList.add('show-waqaf'); else el.classList.remove('show-waqaf'); } }
         function _baseApplyTheme(bg, tx) { userConfig.bgColor=bg; userConfig.textColor=tx; applyConfig(); }
         function setBarPosition(p){ userConfig.barPosition=p; applyConfig(); }
@@ -1912,7 +1915,7 @@
             }
         }
 
-        let currentTopPage=1,currentBottomPage=1,maxPage=604,isFetching=false,currentFontSize=28,startPinch=0,startFont=28,obsTop,obsBottom,obsHeader;
+        let currentTopPage=1,currentBottomPage=1,maxPage=604,isFetching=false,obsTop,obsBottom,obsHeader;
 
         let _ayahPageMap = null;
         function pageOfAyah(s, a){
@@ -2526,20 +2529,6 @@
             }
         }
 
-        // PINCH ZOOM
-        const r=document.getElementById('reading-container');
-        r.addEventListener('touchstart',e=>{if(e.touches.length===2){startPinch=Math.hypot(e.touches[0].pageX-e.touches[1].pageX,e.touches[0].pageY-e.touches[1].pageY);startFont=currentFontSize}},{passive:false});
-        r.addEventListener('touchmove',e=>{
-            if(e.touches.length===2){
-                if(e.cancelable) e.preventDefault();
-                const d=Math.hypot(e.touches[0].pageX-e.touches[1].pageX,e.touches[0].pageY-e.touches[1].pageY);
-                currentFontSize=Math.min(Math.max(startFont*(d/startPinch),20),120);
-                document.documentElement.style.setProperty('--arabic-font-size', currentFontSize+'px');
-            }
-        },{passive:false});
-        r.addEventListener('touchend',e=>{if(e.touches.length<2){userConfig.fontSize=currentFontSize;saveData()}});
-
-
         // ══ NAVIGASI BACK: gestur/tombol back menutup layar teratas, bukan keluar app ══
         function closeTopmostUI() {
             const modals = document.querySelectorAll('.modal-overlay.open');
@@ -3050,6 +3039,7 @@
         document.addEventListener('touchstart', function(e) {
             if (e.touches.length === 2) {
                 e.preventDefault();
+                if (typeof userConfig !== 'undefined' && userConfig.fontLock) return;
                 pinching = true;
                 var dx = e.touches[0].clientX - e.touches[1].clientX;
                 var dy = e.touches[0].clientY - e.touches[1].clientY;
