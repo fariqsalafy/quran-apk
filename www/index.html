@@ -3265,10 +3265,12 @@ function sunPosition(jd){
     var q = (280.459 + 0.98564736*d) % 360;          // mean longitude
     var L = (q + 1.915*Math.sin(degToRad(g)) + 0.020*Math.sin(degToRad(2*g))) % 360; // true longitude
     var e = 23.439 - 0.00000036*d;                   // obliquity
-    var RA = radToDeg(Math.atan2(Math.cos(degToRad(e))*Math.sin(degToRad(L)), Math.cos(degToRad(L)))) / 15; // jam
+    var RA = radToDeg(Math.atan2(Math.cos(degToRad(e))*Math.sin(degToRad(L)), Math.cos(degToRad(L))));
+    if(RA < 0) RA += 360;                            // normalisasi 0..360 (krusial!)
     var decl = radToDeg(Math.asin(Math.sin(degToRad(e))*Math.sin(degToRad(L))));
-    var eqTime = (q/15 - RA) * 60;                   // menit
-    return {decl: decl, eqTime: eqTime};
+    var eqTime = ((q/15 - RA/15) + 24) % 24;         // jam, 0..24
+    if(eqTime > 12) eqTime -= 24;                    // normalisasi -12..12
+    return {decl: decl, eqTime: eqTime * 60};        // eqTime dalam menit
 }
 function degToRad(d){ return d * Math.PI / 180; }
 function radToDeg(r){ return r * 180 / Math.PI; }
@@ -3329,7 +3331,12 @@ function fetchAPI(date, cityId){
         .then(function(j){
             if(!j || !j.data || !j.data.jadwal) throw new Error('Data kosong');
             var day = date.getDate();
-            var row = j.data.jadwal.find(function(x){ return parseInt(String(x.tanggal).slice(8,10)) === day; });
+            // Format MyQuran: 'Sabtu, 15/08/2026' -> ekstrak DD
+            var row = null;
+            for(var i=0;i<j.data.jadwal.length;i++){
+                var m = /(\d{2})\/(\d{2})\/(\d{4})/.exec(j.data.jadwal[i].tanggal);
+                if(m && parseInt(m[1],10) === day){ row = j.data.jadwal[i]; break; }
+            }
             if(!row) row = j.data.jadwal[day-1];
             if(!row) throw new Error('Hari tidak ditemukan');
             return {
@@ -3534,14 +3541,12 @@ function scheduleAdzan(){
     var map = [['Subuh','subuh',9101],['Dzuhur','dzuhur',9102],['Ashar','ashar',9103],['Maghrib','maghrib',9104],['Isya','isya',9105]];
     var notifs = map.map(function(m){
         var t = timeToMinutes(pState.times[m[1]]);
-        var now = new Date();
-        var at = new Date(now.getFullYear(), now.getMonth(), now.getDate(), Math.floor(t/60), t%60);
-        if(at <= now) at = new Date(at.getTime() + 86400000);
         return {
             id: m[2],
             title: '🕌 Waktu ' + m[0],
             body: 'Waktu shalat ' + m[0] + ' — ' + pState.times[m[1]] + ' (Metode Kemenag RI)',
-            schedule: { at: at, allowWhileIdle: true }
+            // berulang HARIAN: on {hour, minute} + every 'day'
+            schedule: { on: { hour: Math.floor(t/60), minute: t%60 }, every: 'day', allowWhileIdle: true }
         };
     });
     cap.cancel({notifications: notifs.map(function(n){return {id:n.id};})}).catch(function(){})

@@ -1,5 +1,17 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.3.1 (Agustus 2026)
+
+- **Fix krusial hisab offline**: normalisasi Right Ascension (0-360°) di
+  `sunPosition` — sebelumnya eqTime bisa meleset ~24 jam saat matahari di
+  belahan langit selatan (Sep–Mar), membuat jadwal Des–Feb kacau. Kini akurat
+  sepanjang tahun, terverifikasi 9 titik tanggal (Agustus 2026 – Maret 2028,
+  termasuk tahun kabisat) vs jadwal Kemenag: selisih maks 3 menit.
+- **Fix parsing tanggal API MyQuran**: format `'Sabtu, 15/08/2026'` kini
+  di-parse dengan regex DD/MM/YYYY (sebelumnya `slice()` rapuh).
+- **Notifikasi adzan berulang harian**: schedule pakai `on:{hour,minute}` +
+  `every:'day'` (sebelumnya `at` sekali-tembak).
+
 ## v3.3.0 (Agustus 2026)
 
 - **Fitur baru: Jadwal Shalat** di hero menu (menggantikan stats 114/6236/30/604).
