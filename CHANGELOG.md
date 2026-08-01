@@ -1,5 +1,15 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.2.0 (Agustus 2026)
+
+- **Default baru**: tema Mushaf (krem), garis mushaf NON-aktif, ukuran teks 70px.
+  Key config dinaikkan `quranProConfig_v4` -> `quranProConfig_v5` agar semua
+  pengguna mendapat default baru.
+- **Update tanpa uninstall**: build kini memakai release keystore tetap
+  (disimpan di GitHub Secrets) + `assembleRelease` + versionCode naik per build.
+  Signature konsisten -> Android bisa install di atas versi lama (tidak perlu
+  uninstall dulu).
+
 ## v3.1.1 (Agustus 2026)
 
 - **Fix: fitur "Pergi ke Ayat" tidak berjalan.** Sebelumnya `goToNavTarget`

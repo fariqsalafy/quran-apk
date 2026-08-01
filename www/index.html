@@ -1323,7 +1323,7 @@
                 <div class="setting-group"><div style="display:flex; justify-content:space-between;"><b>Posisi Garis</b><span id="ruledy-val" style="font-size:0.8rem; opacity:0.7;">30</span></div><input type="range" min="-10" max="45" value="30" id="ruledy-slider" oninput="setRuleDy(this.value)" style="width:100%; margin-top:8px; accent-color:var(--accent-color);"><div style="font-size:0.72rem; opacity:0.6; margin-top:2px;">Naik-turunkan garis mushaf terhadap huruf.</div><div class="radio-grid" style="margin-top:10px;"><div class="radio-btn selected" id="opt-rules-on" onclick="setShowRules(true)"><span style="font-size:0.8rem;">Garis Tampil</span></div><div class="radio-btn" id="opt-rules-off" onclick="setShowRules(false)"><span style="font-size:0.8rem;">Tanpa Garis</span></div></div></div>
                 <div class="setting-group"><b>Tanda Mushaf</b><div style="font-size:0.72rem; opacity:0.6; margin:4px 0 8px;">Tanda kecil (sifr, iqlab, waqaf) butuh font khusus. Jika muncul lingkaran hitam, pilih Sembunyikan.</div><div class="radio-grid"><div class="radio-btn selected" id="opt-marks-auto" onclick="setMarksMode('auto')"><span style="font-size:0.8rem;">Otomatis</span></div><div class="radio-btn" id="opt-marks-show" onclick="setMarksMode('show')"><span style="font-size:0.8rem;">Tampilkan</span></div><div class="radio-btn" id="opt-marks-hide" onclick="setMarksMode('hide')"><span style="font-size:0.8rem;">Sembunyikan</span></div></div></div>
                 <div class="setting-group"><div style="display:flex; justify-content:space-between; align-items:center;"><div><b>Bantuan Waqaf (Warna)</b><div style="font-size:0.8rem; opacity:0.7;">Merah (Berhenti), Hijau (Lanjut).</div></div><label class="switch"><input type="checkbox" id="waqaf-toggle" onchange="toggleWaqaf(this.checked)"><span class="slider"></span></label></div></div>
-                <div class="setting-group"><b>Ukuran Teks: <span id="font-disp">28px</span></b><input type="range" id="font-slider" min="20" max="120" value="28" style="width:100%; margin-top:10px;" oninput="updateFontPreview(this.value)"></div>
+                <div class="setting-group"><b>Ukuran Teks: <span id="font-disp">70px</span></b><input type="range" id="font-slider" min="20" max="120" value="70" style="width:100%; margin-top:10px;" oninput="updateFontPreview(this.value)"></div>
                 <div class="setting-group"><b>Tema Tampilan</b>
                     <div class="theme-cards">
                         <div class="theme-card active" data-bg="#ffffff" onclick="applyTheme('#ffffff','#1a1208')">
@@ -1528,11 +1528,11 @@
             fontFamily: 'UthmanicHafs',
             textAlign: 'center',
             ruleDy: 30,
-            showRules: true,
+            showRules: false,
             marksMode: 'auto',
-            fontSize: 28,
-            bgColor: '#ffffff',
-            textColor: '#1a1208',
+            fontSize: 70,
+            bgColor: '#f2e8c8',
+            textColor: '#2a1800',
             showWaqaf: true,
             barPosition: 'bottom'
         };
@@ -1551,7 +1551,7 @@
         });
 
         function loadConfig(){
-            const saved = localStorage.getItem('quranProConfig_v4');
+            const saved = localStorage.getItem('quranProConfig_v5');
             if(saved) userConfig = {...userConfig, ...JSON.parse(saved)};
             // Sync data-theme from saved bgColor
             { const _bg = userConfig.bgColor;
@@ -1567,7 +1567,7 @@
             applyConfig();
         }
 
-        function saveData(){ localStorage.setItem('quranProConfig_v4', JSON.stringify(userConfig)); }
+        function saveData(){ localStorage.setItem('quranProConfig_v5', JSON.stringify(userConfig)); }
         function getApiEdition() { return userConfig.mode; }
 
         function populateFontDropdown() {
@@ -2685,7 +2685,7 @@
         // --- 1. MODE MALAM OTOMATIS (ikut sistem) ---
         function initAutoTheme() {
             // App default: LIGHT. Follow system, respect manual override.
-            const saved = localStorage.getItem('quranProConfig_v4');
+            const saved = localStorage.getItem('quranProConfig_v5');
             const hasManual = saved && JSON.parse(saved)._manualTheme;
             if (!hasManual) {
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -2699,8 +2699,8 @@
                 applyConfig();
             }
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-                if (localStorage.getItem('quranProConfig_v4') &&
-                    JSON.parse(localStorage.getItem('quranProConfig_v4'))._manualTheme) return;
+                if (localStorage.getItem('quranProConfig_v5') &&
+                    JSON.parse(localStorage.getItem('quranProConfig_v5'))._manualTheme) return;
                 if (e.matches) {
                     document.documentElement.setAttribute('data-theme', 'dark');
                     userConfig.bgColor = '#0d1a1a'; userConfig.textColor = '#ede5d5';
