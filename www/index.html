@@ -2996,16 +2996,9 @@
             const a = parseInt(document.getElementById('nav-ayah-select').value);
             closeModal('nav-modal');
             showToast(`Menuju QS. ${SURAH_META[s-1][0]}: ${a}...`);
-            const p = surahPageMap[s] || 1;
+            const p = pageOfAyah(s, a);   // halaman tempat ayat berada (bukan awal surah)
             await initRead(p);
-            setTimeout(() => {
-                const el = document.getElementById(`ayah-${s}-${a}`);
-                if (el) {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    el.classList.add('active-ayah');
-                    activeAyahId = `ayah-${s}-${a}`;
-                }
-            }, 1200);
+            setTimeout(() => scrollToAyah(s, a, {center: true, highlight: true}), 250);
         }
 
         // --- INIT SEMUA FITUR BARU SAAT LOAD ---

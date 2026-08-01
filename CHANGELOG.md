@@ -1,5 +1,12 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.1.1 (Agustus 2026)
+
+- **Fix: fitur "Pergi ke Ayat" tidak berjalan.** Sebelumnya `goToNavTarget`
+  memakai halaman awal surah (`surahPageMap`), sehingga ayat yang berada di
+  halaman lain tidak pernah ditemukan & tidak di-scroll. Sekarang memakai
+  `pageOfAyah(s,a)` + `scrollToAyah` (pola sama seperti bookmark presisi).
+
 ## v3.1.0 (Agustus 2026)
 
 - Update index.html dari zip `quran-apk-github-v3.zip` — judul aplikasi
