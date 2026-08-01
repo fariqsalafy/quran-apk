@@ -1,10 +1,54 @@
-# Changelog — Al-Qur'an ABBS
+# Changelog — Al-Qur'an Digital
 
-## v2.0.1 (Juli 2026)
+## v3.1.0 (Agustus 2026)
 
-### Perbaikan
-- Fix reading bar pos-bottom melayang di atas gesture navigation — ubah `bottom: env(safe-area-inset-bottom, 0)` → `bottom: 0`
-- App name konsisten "Al-Qur'an Digital" di launcher & APK filename (`AlQuran.apk`)
+- Update index.html dari zip `quran-apk-github-v3.zip` — judul aplikasi
+  "Al-Qur'an Pro v5".
+- Bar baca: jangkar rapat di tepi layar, latar menjulur ke area gestur,
+  kompensasi poni/status-bar untuk mode fullscreen APK.
+- Navigasi: bookmark presisi per-ayat → halaman, buka surah tepat sasaran,
+  info ayat aktif di header bar baca, pemisah "HALAMAN N".
+- Pengaturan: tanda mushaf 3 mode (Otomatis/Tampil/Sembunyikan), garis mushaf,
+  preview hidup di modal Pengaturan, status tombol aktif jelas (centang emas).
+- Tampilan ayat: line-height 2.3, perataan dinamis, basmalah di-fit otomatis.
+
+## v2.0.1 (Agustus 2026)
+
+### Navigasi & Bacaan
+- **Bookmark presisi**: membuka langsung halaman tempat ayat berada (peta
+  ayat→halaman, mis. Ayat Kursi 2:255 → hal. 42), scroll ke tengah layar, dan
+  ayat otomatis ter-highlight — sebelumnya selalu mendarat di awal surah.
+- **Buka surah tepat sasaran**: memilih nama surah kini langsung menampilkan
+  kotak judul surah + basmalah + ayat pertama, tanpa perlu scroll manual.
+- **Info ayat aktif di bar baca**: header menampilkan `QS. [Nama] — Hal. X ·
+  Ayat Y` mengikuti ayat teratas di layar; posisi "Lanjutkan Membaca" kini
+  tersimpan per-ayat secara akurat saat scroll (bukan hanya saat ayat diketuk).
+- **Pemisah antar halaman**: lencana "HALAMAN N" bergaris emas di tiap
+  pergantian halaman.
+- **Basmalah** di awal surah tampil kembali dengan megah — ukurannya di-fit
+  otomatis hingga hampir selebar kolom, mengikuti ukuran huruf & rotasi layar.
+
+### Bar Menu Baca
+- Perbaikan bar **melayang di HP bergaya gesture-bar/berponi**: kompensasi
+  safe-area dobel dihapus; bar bawah kini berjangkar rapat di tepi layar dengan
+  latar menjulur ke area gestur.
+- Bar atas diberi kompensasi poni/status-bar (siap mode fullscreen APK), dan di
+  tablet/layar lebar bar kini menempel penuh tepi-ke-tepi.
+
+### Pengaturan
+- **Tanda Mushaf** (baru): tiga mode — Otomatis (deteksi per-kelompok berbasis
+  pengukuran render nyata), Tampilkan, atau Sembunyikan — untuk mengatasi
+  artefak lingkaran hitam pada perangkat yang memblokir font mushaf.
+- **Garis mushaf**: opsi Garis Tampil / Tanpa Garis.
+- **Preview hidup**: kotak pratinjau kini memperlihatkan efek semua pengaturan
+  sekaligus (garis + posisinya, tanda mushaf, warna waqaf, perataan, font) dan
+  digambar ulang setiap modal Pengaturan dibuka; posisi pratinjau IndoPak
+  diperbaiki.
+- **Status tombol aktif kini jelas** di semua grup (latar solid warna aksen +
+  centang emas) — memperbaiki bug lama di mana pembersih global menghapus
+  penanda "selected" grup Perataan/Garis/Tanda Mushaf.
+- Blok informasi dipertegas menjadi "Sumber Data Al-Qur'an & Atribusi" dengan
+  rincian data 6.236 ayat / 604 halaman.
 
 ## v2.0.0 (Juli 2026)
 
