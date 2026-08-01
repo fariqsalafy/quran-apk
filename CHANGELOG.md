@@ -1,5 +1,20 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.3.0 (Agustus 2026)
+
+- **Fitur baru: Jadwal Shalat** di hero menu (menggantikan stats 114/6236/30/604).
+  - Metode hisab **Kemenag RI** (Subuh -20°, Isya -18°, Ashar bayangan 1x,
+    ihtiyat 2 menit). Hybrid: coba API MyQuran (sumber jadwal Kemenag) dulu,
+    otomatis fallback ke hisab lokal jika offline/gagal.
+  - Lokasi: GPS otomatis ATAU pilih kota manual (54 kota utama Indonesia,
+    termasuk semua kota sekitar ABBS).
+  - Menampilkan 5 waktu shalat + waktu berikutnya + countdown, kartu bisa
+    diketuk untuk membuka pengaturan.
+- **Fitur baru: Notifikasi Adzan** (toggle di modal Jadwal Shalat) — jadwalkan
+  notifikasi tiap waktu shalat via Capacitor Local Notifications (hanya aktif
+  di APK; app perlu dibuka minimal sekali setelah install).
+- Dependency baru: `@capacitor/local-notifications`.
+
 ## v3.2.2 (Agustus 2026)
 
 - **Fix: font default tidak 70.** Pinch handler lama memakai variabel

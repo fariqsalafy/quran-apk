@@ -343,6 +343,52 @@
             letter-spacing: 1.5px; text-transform: uppercase; margin-top: 3px;
         }
 
+        /* Jadwal shalat card (menggantikan stats bar) */
+        #prayer-card { cursor: pointer; transition: background 0.2s; }
+        #prayer-card:active { background: rgba(201,168,76,0.12); }
+        .prayer-top {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 9px 12px 4px; gap: 8px;
+        }
+        .prayer-loc {
+            font-size: 0.72rem; font-weight: 600; color: var(--hero-gold);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .prayer-date {
+            font-size: 0.62rem; color: rgba(255,255,255,0.5);
+            white-space: nowrap; flex-shrink: 0;
+        }
+        .prayer-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr);
+            gap: 4px; padding: 4px 8px 6px;
+        }
+        .prayer-item {
+            text-align: center; padding: 6px 2px 5px; border-radius: 9px;
+            background: rgba(0,0,0,0.15); border: 1px solid rgba(201,168,76,0.08);
+        }
+        .prayer-item .p-name {
+            font-size: 0.58rem; color: rgba(255,255,255,0.6);
+            text-transform: uppercase; letter-spacing: 0.8px;
+        }
+        .prayer-item .p-time {
+            font-size: 0.82rem; font-weight: 700; color: #f5ecd8; margin-top: 2px;
+            font-variant-numeric: tabular-nums;
+        }
+        .prayer-item.next {
+            background: rgba(201,168,76,0.22);
+            border-color: rgba(201,168,76,0.55);
+        }
+        .prayer-item.next .p-time { color: var(--hero-gold); }
+        .prayer-next {
+            text-align: center; padding: 2px 10px 9px;
+            font-size: 0.66rem; color: rgba(255,255,255,0.55);
+        }
+        .prayer-next b { color: var(--hero-gold); font-weight: 700; }
+        .prayer-src {
+            font-size: 0.58rem; color: rgba(255,255,255,0.35);
+            margin-left: 6px; font-weight: 400;
+        }
+
         /* Last read resumption card */
         .last-read-card {
             background: rgba(201,168,76,0.07);
@@ -1309,6 +1355,43 @@
         </div>
     </div>
 
+    <div id="prayer-modal" class="modal-overlay" onclick="closeModal('prayer-modal')">
+        <div class="modal-panel" style="max-width:420px;" onclick="event.stopPropagation()">
+            <div style="padding:22px 20px 18px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                    <h3 style="color:var(--accent-color); margin:0;">🕌 Jadwal Shalat</h3>
+                    <button class="btn-icon" onclick="closeModal('prayer-modal')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                </div>
+
+                <div style="font-size:0.8rem; opacity:0.75; margin-bottom:8px;">Metode penghitungan mengikuti <b>Kemenag RI</b> (hisab + ihtiyat), sumber: API MyQuran/Kemenag — otomatis pakai hisab lokal jika offline.</div>
+
+                <div class="setting-group" style="margin-bottom:12px;">
+                    <b>Lokasi</b>
+                    <div class="radio-grid" style="margin-top:8px;">
+                        <div class="radio-btn" id="pm-auto" onclick="setPrayerMode('auto')"><span style="font-size:0.8rem;">📡 GPS Otomatis</span></div>
+                        <div class="radio-btn" id="pm-manual" onclick="setPrayerMode('manual')"><span style="font-size:0.8rem;">🏙️ Pilih Kota</span></div>
+                    </div>
+                </div>
+
+                <div class="setting-group" id="pm-city-wrap" style="display:none; margin-bottom:12px;">
+                    <b>Kota / Kabupaten</b>
+                    <input type="text" id="pm-city-search" placeholder="Cari kota…" oninput="filterPrayerCities(this.value)" style="width:100%; margin-top:8px; padding:9px 12px; border:1.5px solid var(--border); border-radius:10px; background:var(--bg-elevated); color:var(--text); font-size:0.85rem; outline:none;">
+                    <div id="pm-city-list" style="max-height:160px; overflow-y:auto; margin-top:8px; border:1px solid var(--border); border-radius:10px;"></div>
+                </div>
+
+                <div class="setting-group" style="margin-bottom:14px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div><b>Notifikasi Adzan</b><div style="font-size:0.72rem; opacity:0.7;">Peringatan saat waktu shalat tiba (app harus pernah dibuka).</div></div>
+                        <label class="switch"><input type="checkbox" id="adzan-toggle" onchange="toggleAdzanNotif(this.checked)"><span class="slider"></span></label>
+                    </div>
+                </div>
+
+                <button class="option-btn" style="background:var(--accent-color); color:#fff; justify-content:center; width:100%;" onclick="refreshPrayer()">🔄 Muat Ulang Jadwal</button>
+                <div id="pm-status" style="text-align:center; font-size:0.72rem; opacity:0.6; margin-top:10px;"></div>
+            </div>
+        </div>
+    </div>
+
     <div id="bookmarks-modal" class="modal-overlay" onclick="closeModal('bookmarks-modal')"><div class="modal-panel" style="overflow-y:auto; display:block;" onclick="event.stopPropagation()"><div style="padding:25px;"><div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h3 style="color:var(--accent-color);">Bookmark</h3><button class="btn-icon" onclick="closeModal('bookmarks-modal')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div><div id="bookmark-list-content"></div></div></div></div>
     <div id="ayah-modal" class="modal-overlay" onclick="closeModal('ayah-modal')"><div class="modal-panel" style="overflow-y:auto; display:block;" onclick="event.stopPropagation()"><div id="ayah-modal-content" style="padding:25px;"></div></div></div>
     <div id="tafsir-modal" class="modal-overlay" onclick="closeModal('tafsir-modal')"><div class="modal-panel" style="height:85vh; overflow-y:auto; display:block;" onclick="event.stopPropagation()"><div style="padding:25px;"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;"><h3 style="color:var(--accent-color); margin:0;">Terjemahan</h3><div style="display:flex; gap:10px;"><button class="option-btn" style="padding:5px 15px; margin:0; width:auto; font-size:0.9rem;" onclick="copyTafsirContent()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Salin</button><button class="btn-icon" onclick="closeModal('tafsir-modal')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div></div><div id="tafsir-meta" style="font-size:0.85rem; color:var(--text-color); opacity:0.7; margin-bottom:15px; font-weight:600; border-bottom:1px solid rgba(0,0,0,0.1); padding-bottom:10px;"></div><div id="tafsir-loader" style="text-align:center;">Memuat...</div><div id="tafsir-content-box" style="display:none; font-size:0.95rem; line-height:1.6; text-align:justify;"><div id="tafsir-body"></div></div></div></div></div>
@@ -1348,24 +1431,14 @@
                     <div class="ornament-line rev"></div>
                 </div>
 
-                <!-- Stats bar -->
-                <div class="hero-stats">
-                    <div class="hero-stat">
-                        <div class="hero-stat-val">114</div>
-                        <div class="hero-stat-lbl">Surah</div>
+                <!-- Jadwal shalat (menggantikan stats bar) -->
+                <div class="hero-stats" id="prayer-card" onclick="openPrayerModal()">
+                    <div class="prayer-top">
+                        <div class="prayer-loc" id="prayer-loc">📍 Menentukan lokasi…</div>
+                        <div class="prayer-date" id="prayer-date"></div>
                     </div>
-                    <div class="hero-stat">
-                        <div class="hero-stat-val">6.236</div>
-                        <div class="hero-stat-lbl">Ayat</div>
-                    </div>
-                    <div class="hero-stat">
-                        <div class="hero-stat-val">30</div>
-                        <div class="hero-stat-lbl">Juz</div>
-                    </div>
-                    <div class="hero-stat">
-                        <div class="hero-stat-val">604</div>
-                        <div class="hero-stat-lbl">Halaman</div>
-                    </div>
+                    <div class="prayer-grid" id="prayer-grid"></div>
+                    <div class="prayer-next" id="prayer-next"></div>
                 </div>
 
                 <!-- Last read resumption card -->
@@ -3086,5 +3159,445 @@
         }, { passive: true });
     })();
     </script>
+
+<script>
+/* ============================================================
+   JADWAL SHALAT — Metode Hisab Kemenag RI (hybrid: API + lokal)
+   ============================================================ */
+(function(){
+'use strict';
+
+// ── Daftar kota (id MyQuran, nama, lat, lng) — kota utama + sekitar ABBS ──
+var PRAYER_CITIES = [
+    {id:'1434', name:'Surakarta',     lat:-7.5567, lng:110.8317},
+    {id:'1405', name:'Boyolali',      lat:-7.5331, lng:110.5959},
+    {id:'1411', name:'Karanganyar',   lat:-7.6281, lng:110.9504},
+    {id:'1414', name:'Klaten',        lat:-7.7058, lng:110.6066},
+    {id:'1430', name:'Magelang',      lat:-7.4797, lng:110.2177},
+    {id:'1432', name:'Salatiga',      lat:-7.3305, lng:110.5084},
+    {id:'1424', name:'Sragen',        lat:-7.4262, lng:111.0221},
+    {id:'1425', name:'Sukoharjo',     lat:-7.6805, lng:110.8373},
+    {id:'1505', name:'Yogyakarta',    lat:-7.7956, lng:110.3695},
+    {id:'1433', name:'Semarang',      lat:-6.9667, lng:110.4167},
+    {id:'1415', name:'Kudus',         lat:-6.8048, lng:110.8405},
+    {id:'1431', name:'Pekalongan',    lat:-6.8886, lng:109.6753},
+    {id:'1435', name:'Tegal',         lat:-6.8694, lng:109.1402},
+    {id:'1407', name:'Cilacap',       lat:-7.7419, lng:109.0093},
+    {id:'1402', name:'Purwokerto',    lat:-7.4214, lng:109.2344},
+    {id:'1219', name:'Bandung',       lat:-6.9175, lng:107.6191},
+    {id:'1222', name:'Bogor',         lat:-6.5971, lng:106.8060},
+    {id:'1301', name:'Jakarta Pusat', lat:-6.2088, lng:106.8456},
+    {id:'1225', name:'Depok',         lat:-6.4025, lng:106.7942},
+    {id:'1221', name:'Bekasi',        lat:-6.2383, lng:106.9756},
+    {id:'1107', name:'Tangerang',     lat:-6.1783, lng:106.6319},
+    {id:'1224', name:'Cirebon',       lat:-6.7320, lng:108.5523},
+    {id:'1227', name:'Tasikmalaya',   lat:-7.3274, lng:108.2207},
+    {id:'1638', name:'Surabaya',      lat:-7.2575, lng:112.7521},
+    {id:'1634', name:'Malang',        lat:-7.9797, lng:112.6304},
+    {id:'1624', name:'Sidoarjo',      lat:-7.4478, lng:112.7183},
+    {id:'1606', name:'Gresik',        lat:-7.1545, lng:112.6561},
+    {id:'1632', name:'Kediri',        lat:-7.8480, lng:112.0178},
+    {id:'1633', name:'Madiun',        lat:-7.6298, lng:111.5239},
+    {id:'1607', name:'Jember',        lat:-8.1845, lng:113.6681},
+    {id:'1602', name:'Banyuwangi',    lat:-8.2192, lng:114.3691},
+    {id:'1709', name:'Denpasar',      lat:-8.6705, lng:115.2126},
+    {id:'1810', name:'Mataram',       lat:-8.5833, lng:116.1167},
+    {id:'1922', name:'Kupang',        lat:-10.1772, lng:123.6070},
+    {id:'2622', name:'Makassar',      lat:-5.1477, lng:119.4327},
+    {id:'2914', name:'Manado',        lat:-1.4748, lng:124.8421},
+    {id:'2813', name:'Palu',          lat:-0.8917, lng:119.8707},
+    {id:'2717', name:'Kendari',       lat:-3.9450, lng:122.4999},
+    {id:'3110', name:'Ambon',         lat:-3.6954, lng:128.1814},
+    {id:'3329', name:'Jayapura',      lat:-2.5337, lng:140.7181},
+    {id:'2013', name:'Pontianak',     lat:-0.0263, lng:109.3425},
+    {id:'2214', name:'Palangkaraya',  lat:-2.2130, lng:113.9175},
+    {id:'2113', name:'Banjarmasin',   lat:-3.3186, lng:114.5944},
+    {id:'2308', name:'Balikpapan',    lat:-1.2379, lng:116.8529},
+    {id:'2310', name:'Samarinda',     lat:-0.5021, lng:117.1537},
+    {id:'0412', name:'Pekanbaru',     lat:0.5071, lng:101.4478},
+    {id:'0314', name:'Padang',        lat:-0.9471, lng:100.4172},
+    {id:'0228', name:'Medan',         lat:3.5952, lng:98.6722},
+    {id:'0119', name:'Banda Aceh',    lat:5.5483, lng:95.3232},
+    {id:'0610', name:'Jambi',         lat:-1.5950, lng:103.6096},
+    {id:'0816', name:'Palembang',     lat:-2.9761, lng:104.7754},
+    {id:'0710', name:'Bengkulu',      lat:-3.8007, lng:102.2591},
+    {id:'1014', name:'Bandar Lampung',lat:-5.3971, lng:105.2668}
+];
+
+// ── State ──
+var pState = {
+    mode: 'auto',        // 'auto' = GPS, 'manual' = kota
+    cityId: null,        // id MyQuran kota terpilih (manual)
+    cityName: null,
+    lat: null, lng: null,
+    adzan: false,        // notifikasi adzan aktif
+    source: '',          // 'API' | 'HISAB'
+    times: null,         // {subuh, dzuhur, ashar, maghrib, isya, terbit}
+    dateKey: ''
+};
+
+var PRAYER_STORE = 'quranProPrayer_v1';
+var PM_STATUS = null;
+
+function loadPrayerState(){
+    try{
+        var s = localStorage.getItem(PRAYER_STORE);
+        if(s) pState = Object.assign(pState, JSON.parse(s));
+    }catch(e){}
+}
+function savePrayerState(){
+    try{ localStorage.setItem(PRAYER_STORE, JSON.stringify(pState)); }catch(e){}
+}
+
+/* ── Hisab Kemenag RI ──────────────────────────────────────────
+   Parameter: Subuh -20°, Isya -18°, Ashar bayangan 1x (faktor 1),
+   Maghrib saat terbenam (0.833° + ihtiyat), Dzuhur zawal + ihtiyat 2 menit. */
+function toJulian(date){
+    var y = date.getFullYear(), m = date.getMonth() + 1, d = date.getDate();
+    if(m <= 2){ y -= 1; m += 12; }
+    var A = Math.floor(y/100), B = 2 - A + Math.floor(A/4);
+    return Math.floor(365.25*(y+4716)) + Math.floor(30.6001*(m+1)) + d + B - 1524.5;
+}
+function sunPosition(jd){
+    // Algoritma Meeus/NOAA (dipakai PrayTimes) — akurasi ~1 menit
+    var d = jd - 2451545.0;
+    var g = (357.529 + 0.98560028*d) % 360;          // mean anomaly
+    var q = (280.459 + 0.98564736*d) % 360;          // mean longitude
+    var L = (q + 1.915*Math.sin(degToRad(g)) + 0.020*Math.sin(degToRad(2*g))) % 360; // true longitude
+    var e = 23.439 - 0.00000036*d;                   // obliquity
+    var RA = radToDeg(Math.atan2(Math.cos(degToRad(e))*Math.sin(degToRad(L)), Math.cos(degToRad(L)))) / 15; // jam
+    var decl = radToDeg(Math.asin(Math.sin(degToRad(e))*Math.sin(degToRad(L))));
+    var eqTime = (q/15 - RA) * 60;                   // menit
+    return {decl: decl, eqTime: eqTime};
+}
+function degToRad(d){ return d * Math.PI / 180; }
+function radToDeg(r){ return r * 180 / Math.PI; }
+function hourAngle(lat, decl, alt){
+    var cosH = (Math.sin(degToRad(alt)) - Math.sin(degToRad(lat))*Math.sin(degToRad(decl)))
+             / (Math.cos(degToRad(lat))*Math.cos(degToRad(decl)));
+    if(cosH > 1) cosH = 1; if(cosH < -1) cosH = -1;
+    return radToDeg(Math.acos(cosH));
+}
+function minutesToTime(min){
+    var h = Math.floor(min/60), m = Math.round(min % 60);
+    if(m === 60){ h += 1; m = 0; }
+    h = ((h % 24) + 24) % 24;
+    return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+}
+function timeToMinutes(t){
+    var p = String(t).split(':');
+    return parseInt(p[0])*60 + parseInt(p[1]);
+}
+/* Hitung jadwal untuk tanggal lokal (WIB/WITA/WIT dari bujur) */
+function computeHisab(date, lat, lng){
+    var tz = lng < 115 ? 7 : (lng < 125 ? 8 : 9);  // WIB/WITA/WIT
+    var jd = toJulian(date);
+    var sun = sunPosition(jd);
+    var decl = sun.decl, eqT = sun.eqTime; // eqT menit
+    // zawal (tengah hari) dalam menit lokal
+    var zawal = 720 - 4*lng + 60*tz - eqT;
+    var altSubuh = -20, altIsya = -18, altTerbit = -0.833;
+    // Ashar: bayangan = panjang benda (faktor 1) -> cot(h) = tan(|lat-dec|)+1
+    var aDiff = Math.abs(lat - decl);
+    var hAshar = radToDeg(Math.atan(1 / (Math.tan(degToRad(aDiff)) + 1)));
+    function tAt(alt){
+        var H = hourAngle(lat, decl, alt);
+        return zawal - H*4;  // menit lokal
+    }
+    var subuh  = tAt(altSubuh) + 2;   // ihtiyat 2 menit (pagi: zawal - H)
+    var terbit = tAt(altTerbit);
+    var dzuhur = zawal + 2;           // ihtiyat
+    var ashar  = zawal + hourAngle(lat, decl, hAshar)*4 + 2;
+    var maghrib= zawal + hourAngle(lat, decl, -0.833)*4 + 2;
+    var isya   = zawal + hourAngle(lat, decl, altIsya)*4 + 2;  // petang: zawal + H
+    return {
+        subuh: minutesToTime(subuh),
+        terbit: minutesToTime(terbit),
+        dzuhur: minutesToTime(dzuhur),
+        ashar: minutesToTime(ashar),
+        maghrib: minutesToTime(maghrib),
+        isya: minutesToTime(isya)
+    };
+}
+
+/* ── API MyQuran (sumber jadwal Kemenag RI) ── */
+function fetchAPI(date, cityId){
+    var y = date.getFullYear(), m = date.getMonth() + 1;
+    var mm = (m < 10 ? '0' : '') + m;
+    return fetch('https://api.myquran.com/v2/sholat/jadwal/' + cityId + '/' + y + '/' + mm, {mode:'cors'})
+        .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+        .then(function(j){
+            if(!j || !j.data || !j.data.jadwal) throw new Error('Data kosong');
+            var day = date.getDate();
+            var row = j.data.jadwal.find(function(x){ return parseInt(String(x.tanggal).slice(8,10)) === day; });
+            if(!row) row = j.data.jadwal[day-1];
+            if(!row) throw new Error('Hari tidak ditemukan');
+            return {
+                subuh: row.subuh, terbit: row.terbit, dzuhur: row.dzuhur,
+                ashar: row.ashar, maghrib: row.maghrib, isya: row.isya,
+                lokasi: j.data.lokasi
+            };
+        });
+}
+
+/* ── Render ── */
+function fmtDate(d){
+    var nama = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+    var bln = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    return nama[d.getDay()] + ', ' + d.getDate() + ' ' + bln[d.getMonth()] + ' ' + d.getFullYear();
+}
+function renderPrayer(){
+    var grid = document.getElementById('prayer-grid');
+    var next = document.getElementById('prayer-next');
+    var loc = document.getElementById('prayer-loc');
+    var dt = document.getElementById('prayer-date');
+    if(!grid || !pState.times) return;
+    dt.textContent = fmtDate(new Date());
+    var names = [['Subuh','subuh'],['Dzuhur','dzuhur'],['Ashar','ashar'],['Maghrib','maghrib'],['Isya','isya']];
+    var now = new Date();
+    var nowMin = now.getHours()*60 + now.getMinutes();
+    var html = '', nextIdx = -1, nextMin = null;
+    for(var i=0;i<names.length;i++){
+        var t = pState.times[names[i][1]];
+        var tm = timeToMinutes(t);
+        if(nextMin === null || (tm > nowMin && tm < nextMin)){ nextMin = tm; nextIdx = i; }
+    }
+    for(var i2=0;i2<names.length;i2++){
+        html += '<div class="prayer-item' + (i2===nextIdx ? ' next' : '') + '">'
+              + '<div class="p-name">' + names[i2][0] + '</div>'
+              + '<div class="p-time">' + pState.times[names[i2][1]] + '</div></div>';
+    }
+    grid.innerHTML = html;
+    // countdown
+    var locName = pState.cityName || (pState.mode==='auto' ? 'Lokasi GPS' : '');
+    var srcLabel = pState.source === 'API' ? '· Kemenag API' : '· Hisab Lokal';
+    if(nextMin === null){
+        // semua waktu sudah lewat -> besok subuh
+        var tmr = computeHisab(new Date(now.getTime()+86400000), pState.lat, pState.lng);
+        var tmrSubuh = timeToMinutes(tmr.subuh);
+        var sisa = (24*60 - nowMin) + tmrSubuh;
+        next.innerHTML = '⏰ <b>Subuh besok</b> ' + tmr.subuh + ' — dalam ' + durText(sisa) + ' <span class="prayer-src">' + srcLabel + '</span>';
+    } else {
+        var sisa2 = nextMin - nowMin;
+        var nm = names[nextIdx][0];
+        next.innerHTML = '⏰ <b>' + nm + '</b> ' + pState.times[names[nextIdx][1]] + ' — dalam ' + durText(sisa2) + ' <span class="prayer-src">' + srcLabel + '</span>';
+    }
+    loc.innerHTML = '🕌 ' + (locName || 'Jadwal Shalat');
+}
+function durText(min){
+    if(min < 60) return min + ' mnt';
+    var h = Math.floor(min/60), m = min % 60;
+    return (m ? h + ' jam ' + m + ' mnt' : h + ' jam');
+}
+
+/* ── Muat jadwal: hybrid API → hisab ── */
+function getToday(){ var d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+function setStatus(msg){ if(PM_STATUS) PM_STATUS.textContent = msg; }
+function refreshPrayer(){
+    var status = document.getElementById('pm-status');
+    setStatus('Memuat jadwal…');
+    var today = getToday();
+    var key = today.getFullYear()+'-'+today.getMonth()+'-'+today.getDate();
+    if(pState.mode === 'auto' && (pState.lat == null || pState.lng == null)){
+        // minta GPS dulu
+        if(navigator.geolocation){
+            setStatus('Mendeteksi lokasi GPS…');
+            navigator.geolocation.getCurrentPosition(function(pos){
+                pState.lat = pos.coords.latitude;
+                pState.lng = pos.coords.longitude;
+                pState.cityName = null;
+                savePrayerState();
+                loadPrayer(pState.lat, pState.lng, null, key, status);
+            }, function(err){
+                setStatus('⚠️ GPS gagal — pilih kota manual.');
+            }, {enableHighAccuracy:false, timeout:10000, maximumAge:60000});
+        } else {
+            setStatus('⚠️ GPS tidak didukung — pilih kota manual.');
+        }
+        return;
+    }
+    loadPrayer(pState.lat, pState.lng, pState.cityId, key, status);
+}
+function loadPrayer(lat, lng, cityId, key, status){
+    var date = getToday();
+    if(pState.mode === 'manual' && cityId){
+        // 1) coba API
+        fetchAPI(date, cityId).then(function(res){
+            pState.times = {subuh:res.subuh, terbit:res.terbit, dzuhur:res.dzuhur, ashar:res.ashar, maghrib:res.maghrib, isya:res.isya};
+            pState.lat = lat; pState.lng = lng;
+            pState.dateKey = key;
+            pState.source = 'API';
+            savePrayerState();
+            renderPrayer();
+            if(status) status.textContent = '✓ Sumber: Kemenag (API) — ' + (res.lokasi || pState.cityName);
+            syncAdzanToggle();
+            scheduleAdzan();
+        }).catch(function(){
+            // 2) fallback hisab lokal
+            hisabFallback(lat, lng, key, status);
+        });
+    } else {
+        hisabFallback(lat, lng, key, status);
+    }
+}
+function hisabFallback(lat, lng, key, status){
+    var date = getToday();
+    pState.times = computeHisab(date, lat, lng);
+    pState.lat = lat; pState.lng = lng;
+    pState.dateKey = key;
+    pState.source = 'HISAB';
+    savePrayerState();
+    renderPrayer();
+    if(status) status.textContent = '✓ Sumber: Hisab Lokal (Metode Kemenag)';
+    syncAdzanToggle();
+    scheduleAdzan();
+}
+
+/* ── Modal & mode ── */
+function openPrayerModal(){
+    loadPrayerState();
+    PM_STATUS = document.getElementById('pm-status');
+    document.getElementById('pm-auto').classList.toggle('selected', pState.mode==='auto');
+    document.getElementById('pm-manual').classList.toggle('selected', pState.mode==='manual');
+    document.getElementById('pm-city-wrap').style.display = pState.mode==='manual' ? 'block' : 'none';
+    renderCityList('');
+    syncAdzanToggle();
+    document.getElementById('prayer-modal').classList.add('open');
+    if(PM_STATUS) PM_STATUS.textContent = '';
+}
+function setPrayerMode(m){
+    pState.mode = m;
+    savePrayerState();
+    document.getElementById('pm-auto').classList.toggle('selected', m==='auto');
+    document.getElementById('pm-manual').classList.toggle('selected', m==='manual');
+    document.getElementById('pm-city-wrap').style.display = m==='manual' ? 'block' : 'none';
+    if(m==='auto') refreshPrayer();
+}
+function renderCityList(q){
+    var box = document.getElementById('pm-city-list');
+    var ql = (q||'').toLowerCase();
+    var list = PRAYER_CITIES.filter(function(c){ return c.name.toLowerCase().indexOf(ql) >= 0; });
+    box.innerHTML = '';
+    list.forEach(function(c){
+        var div = document.createElement('div');
+        div.style.cssText = 'padding:9px 12px; cursor:pointer; border-radius:8px; font-size:0.85rem;';
+        div.textContent = '🏙️ ' + c.name;
+        div.onmouseenter = function(){ div.style.background = 'var(--bg-elevated)'; };
+        div.onmouseleave = function(){ div.style.background = 'transparent'; };
+        div.onclick = function(){
+            pState.cityId = c.id; pState.cityName = c.name;
+            pState.lat = c.lat; pState.lng = c.lng;
+            savePrayerState();
+            refreshPrayer();
+        };
+        box.appendChild(div);
+    });
+    if(!list.length) box.innerHTML = '<div style="padding:9px; font-size:0.8rem; opacity:0.5;">Kota tidak ditemukan</div>';
+}
+function filterPrayerCities(v){ renderCityList(v); }
+
+/* ── Notifikasi adzan (Capacitor Local Notifications) ── */
+function capNotif(){
+    try{
+        if(window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) return window.Capacitor.Plugins.LocalNotifications;
+    }catch(e){}
+    return null;
+}
+function toggleAdzanNotif(v){
+    pState.adzan = v;
+    savePrayerState();
+    if(v){
+        var cap = capNotif();
+        if(cap){
+            cap.requestPermissions().then(function(){
+                scheduleAdzan();
+                setStatus('✓ Notifikasi adzan aktif');
+            }).catch(function(){ setStatus('⚠️ Izin notifikasi ditolak'); pState.adzan=false; savePrayerState(); syncAdzanToggle(); });
+        } else {
+            setStatus('⚠️ Notifikasi hanya aktif di APK (bukan browser)');
+            pState.adzan = false; savePrayerState(); syncAdzanToggle();
+        }
+    } else {
+        var cap2 = capNotif();
+        if(cap2) cap2.cancel({notifications: [{id: 9101},{id: 9102},{id: 9103},{id: 9104},{id: 9105}]}).catch(function(){});
+        setStatus('Notifikasi adzan dimatikan');
+    }
+}
+function syncAdzanToggle(){
+    var t = document.getElementById('adzan-toggle');
+    if(t) t.checked = !!pState.adzan;
+}
+function scheduleAdzan(){
+    if(!pState.adzan || !pState.times) return;
+    var cap = capNotif();
+    if(!cap) return;
+    var map = [['Subuh','subuh',9101],['Dzuhur','dzuhur',9102],['Ashar','ashar',9103],['Maghrib','maghrib',9104],['Isya','isya',9105]];
+    var notifs = map.map(function(m){
+        var t = timeToMinutes(pState.times[m[1]]);
+        var now = new Date();
+        var at = new Date(now.getFullYear(), now.getMonth(), now.getDate(), Math.floor(t/60), t%60);
+        if(at <= now) at = new Date(at.getTime() + 86400000);
+        return {
+            id: m[2],
+            title: '🕌 Waktu ' + m[0],
+            body: 'Waktu shalat ' + m[0] + ' — ' + pState.times[m[1]] + ' (Metode Kemenag RI)',
+            schedule: { at: at, allowWhileIdle: true }
+        };
+    });
+    cap.cancel({notifications: notifs.map(function(n){return {id:n.id};})}).catch(function(){})
+       .finally(function(){ cap.schedule({notifications: notifs}).catch(function(){}); });
+}
+
+/* ── Init ── */
+function initPrayer(){
+    loadPrayerState();
+    if(pState.lat == null || pState.lng == null){
+        // default: coba GPS, fallback Surakarta (ABBS)
+        if(pState.mode === 'manual' && pState.cityId){
+            var c = PRAYER_CITIES.find(function(x){ return x.id === pState.cityId; });
+            if(c){ pState.lat=c.lat; pState.lng=c.lng; }
+        }
+        if(pState.lat == null || pState.lng == null){
+            pState.lat = -7.5567; pState.lng = 110.8317; pState.cityName = 'Surakarta';
+        }
+    }
+    // muat jadwal (tanpa GPS ulang saat init — pakai yang tersimpan)
+    var today = getToday();
+    var key = today.getFullYear()+'-'+today.getMonth()+'-'+today.getDate();
+    if(pState.dateKey !== key){
+        if(pState.mode === 'manual' && pState.cityId){
+            loadPrayer(pState.lat, pState.lng, pState.cityId, key, null);
+        } else {
+            // coba GPS sekali di awal jika auto & belum punya koordinat akurat
+            if(pState.mode === 'auto' && navigator.geolocation){
+                navigator.geolocation.getCurrentPosition(function(pos){
+                    pState.lat = pos.coords.latitude; pState.lng = pos.coords.longitude;
+                    pState.cityName = null; savePrayerState();
+                    loadPrayer(pState.lat, pState.lng, null, key, null);
+                }, function(){
+                    hisabFallback(pState.lat, pState.lng, key, null);
+                }, {enableHighAccuracy:false, timeout:8000, maximumAge:60000});
+            } else {
+                hisabFallback(pState.lat, pState.lng, key, null);
+            }
+        }
+    } else {
+        renderPrayer();
+        syncAdzanToggle();
+        scheduleAdzan();
+    }
+    // update countdown tiap 30 detik
+    setInterval(function(){ renderPrayer(); }, 30000);
+}
+
+window.addEventListener('load', function(){ initPrayer(); });
+// ekspos untuk onclick
+window.openPrayerModal = openPrayerModal;
+window.setPrayerMode = setPrayerMode;
+window.filterPrayerCities = filterPrayerCities;
+window.toggleAdzanNotif = toggleAdzanNotif;
+window.refreshPrayer = refreshPrayer;
+})();
+</script>
 </body>
 </html>
