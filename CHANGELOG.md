@@ -1,5 +1,13 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.5.0 (Agustus 2026)
+
+- **Fitur baru: navigasi di Tafsir Jalalain.** Geser horizontal pada konten
+  tafsir (kiri = ayat berikutnya, kanan = sebelumnya) + tombol panah ◀ ▶ di
+  header modal. Navigasi lintas surat (ayat terakhir → surat berikutnya ayat
+  1, dst.) dan berhenti di ujung Al-Qur'an (1:1 / 114:6). Refactor:
+  `loadTafsirFor(s,a)` dipisah agar dipakai buka modal & navigasi.
+
 ## v3.4.9 (Agustus 2026)
 
 - **Fitur baru: Tafsir Jalalain full offline.** Modal "Tafsir/Terjemah"
