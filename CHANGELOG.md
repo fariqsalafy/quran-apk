@@ -1,5 +1,13 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.4.5 (Agustus 2026)
+
+- **Fix: ukuran teks "kembali" ke nilai lama setelah diubah.** Slider Ukuran
+  Teks hanya punya `oninput` (live preview) tanpa menyimpan — nilai baru
+  tersimpan hanya jika kebetulan ada aksi lain yang memicu saveData (toggle
+  pengaturan, tutup reader). Kini slider punya `onchange="saveData()"`:
+  begitu jari dilepas, nilai langsung tersimpan ke localStorage.
+
 ## v3.4.4 (Agustus 2026)
 
 - **Fix: jadwal shalat hang saat offline / jaringan lambat.** `fetchMonthAPI`
