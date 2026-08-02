@@ -1447,7 +1447,7 @@
 
     <div id="bookmarks-modal" class="modal-overlay" onclick="closeModal('bookmarks-modal')"><div class="modal-panel" style="overflow-y:auto; display:block;" onclick="event.stopPropagation()"><div style="padding:25px;"><div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h3 style="color:var(--accent-color);">Bookmark</h3><button class="btn-icon" onclick="closeModal('bookmarks-modal')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div><div id="bookmark-list-content"></div></div></div></div>
     <div id="ayah-modal" class="modal-overlay" onclick="closeModal('ayah-modal')"><div class="modal-panel" style="overflow-y:auto; display:block;" onclick="event.stopPropagation()"><div id="ayah-modal-content" style="padding:25px;"></div></div></div>
-    <div id="tafsir-modal" class="modal-overlay" onclick="closeModal('tafsir-modal')"><div class="modal-panel" style="height:85vh; overflow-y:auto; display:block;" onclick="event.stopPropagation()"><div style="padding:25px;"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;"><button class="btn-icon" onclick="tafsirNav(-1)" title="Ayat sebelumnya" style="font-size:1.1rem;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button><h3 style="color:var(--accent-color); margin:0;">Tafsir Jalalain</h3><div style="display:flex; gap:10px;"><button class="btn-icon" onclick="tafsirNav(1)" title="Ayat berikutnya" style="font-size:1.1rem;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button><button class="option-btn" style="padding:5px 15px; margin:0; width:auto; font-size:0.9rem;" onclick="copyTafsirContent()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Salin</button><button class="btn-icon" onclick="closeModal('tafsir-modal')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div></div><div id="tafsir-meta" style="font-size:0.85rem; color:var(--text-color); opacity:0.7; margin-bottom:15px; font-weight:600; border-bottom:1px solid rgba(0,0,0,0.1); padding-bottom:10px;"></div><div id="tafsir-loader" style="text-align:center;">Memuat...</div><div id="tafsir-content-box" style="display:none; font-size:0.95rem; line-height:1.6; text-align:justify;"><div id="tafsir-body"></div></div></div></div></div>
+    <div id="tafsir-modal" class="modal-overlay" onclick="closeModal('tafsir-modal')"><div class="modal-panel" style="height:85vh; overflow-y:auto; display:block;" onclick="event.stopPropagation()"><div style="padding:25px;"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;"><button class="btn-icon" onclick="tafsirNav(-1)" title="Ayat sebelumnya" style="font-size:1.1rem;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button><h3 style="color:var(--accent-color); margin:0;">Terjemah &amp; Tafsir</h3><div style="display:flex; gap:10px;"><button class="btn-icon" onclick="tafsirNav(1)" title="Ayat berikutnya" style="font-size:1.1rem;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button><button class="option-btn" style="padding:5px 15px; margin:0; width:auto; font-size:0.9rem;" onclick="copyTafsirContent()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Salin</button><button class="btn-icon" onclick="closeModal('tafsir-modal')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div></div><div id="tafsir-meta" style="font-size:0.85rem; color:var(--text-color); opacity:0.7; margin-bottom:15px; font-weight:600; border-bottom:1px solid rgba(0,0,0,0.1); padding-bottom:10px;"></div><div id="tafsir-loader" style="text-align:center;">Memuat...</div><div id="tafsir-content-box" style="display:none; font-size:0.95rem; line-height:1.6; text-align:justify;"><div id="tafsir-body"></div></div></div></div></div>
     <div id="info-modal" class="modal-overlay" onclick="closeModal('info-modal')"><div class="modal-panel" style="overflow-y:auto; display:block;" onclick="event.stopPropagation()"><div style="padding:25px;"><h2 style="margin-bottom:15px; color:var(--accent-color);">Tentang Aplikasi</h2><div style="line-height:1.6; font-size:0.9rem; color:var(--text-color);"><p style="margin-bottom:12px;">Aplikasi Al-Qur'an digital — Rasm Utsmani Madinah &amp; IndoPak, terjemahan Indonesia, audio murattal, 100% dapat offline.</p><div style="padding:12px 14px; background:rgba(0,0,0,0.03); border:1px solid rgba(0,0,0,0.05); border-radius:10px; margin-bottom:12px; font-size:0.78rem; line-height:1.7;"><b style="color:var(--accent-color);">Sumber Data Al-Qur'an &amp; Atribusi</b><br>• Data 6.236 ayat / 604 halaman mushaf<br>• Teks Rasm Utsmani: Tanzil.net (quran-uthmani)<br>• Teks IndoPak (Mushaf Majeed): Quranic Universal Library / QuranWBW<br>• Font: KFGQPC Uthmanic Hafs (Mujamma' Raja Fahd, Madinah) &amp; IndoPak Nastaleeq (QuranWBW)<br>• Terjemahan Bahasa Indonesia: AlQuran Cloud<br>• Tafsir Jalalain: renomureza/quran-api-id (MIT) — sumber Tafsir Al-Jalalain<br>• Audio: Misyari Rasyid Al-'Afasy — Islamic Network CDN</div><div style="text-align:center; padding:15px; background:rgba(0,0,0,0.03); border-radius:10px; border:1px solid rgba(0,0,0,0.05);"><div style="font-size:0.8rem; opacity:0.6;">Dibuat oleh:</div><div style="font-weight:700; color:var(--accent-color); font-size:1.1rem; margin-bottom:10px;">M Fariq Salafy</div></div></div><button class="option-btn" style="margin-top:20px; justify-content:center;" onclick="closeModal('info-modal')">Tutup</button></div></div></div>
 
     <div id="menu-container">
@@ -2554,7 +2554,7 @@
                 <h3 style="color:var(--accent-color);margin-bottom:5px;">QS. ${sNameId}</h3>
                 <div style="font-size:0.9rem;opacity:0.7;margin-bottom:20px;">Ayat ${selectedAyah.a}</div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                    <button class="option-btn" style="justify-content:center;" onclick="triggerTafsir()">📖 Tafsir/Terjemah</button>
+                    <button class="option-btn" style="justify-content:center;" onclick="triggerTafsir()">📖 Terjemah &amp; Tafsir</button>
                     <button class="option-btn" style="justify-content:center;" onclick="triggerBookmark()">${isBm?'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="16"/><line x1="15" y1="10" x2="9" y2="16"/></svg> Hapus Bookmark':'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Tambah Bookmark'}</button>
                     <button class="option-btn" style="justify-content:center;" onclick="triggerCopyMenu()">📋 Salin Ayat</button>
                     <button class="option-btn" style="justify-content:center;" onclick="triggerAudio()">🔊 Putar Audio</button>
@@ -2575,45 +2575,48 @@
             closeModal('ayah-modal'); document.getElementById('tafsir-modal').classList.add('open');
             await loadTafsirFor(selectedAyah.s, selectedAyah.a);
         }
-        // Muat tafsir utk (s,a) — dipakai triggerTafsir & navigasi ◀ ▶ / swipe
+        // Muat terjemah + tafsir utk (s,a) — dipakai triggerTafsir & navigasi ◀ ▶ / swipe
         async function loadTafsirFor(s, a){
             document.getElementById('tafsir-loader').style.display='block'; document.getElementById('tafsir-content-box').style.display='none';
             try{
                 const key = `${s}:${a}`;
-                // 1) Tafsir Jalalain offline (tafsir-jalalain.json, load sekali + cache)
-                const jl = await ensureTafsirDB();
-                if(jl && jl[key]){
-                    document.getElementById('tafsir-loader').style.display='none';
-                    document.getElementById('tafsir-content-box').style.display='block';
-                    const indoName2 = SURAH_META[s-1][0];
-                    document.getElementById('tafsir-meta').innerText = `QS. ${indoName2} • Ayat ${a}`;
-                    document.getElementById('tafsir-body').innerText = jl[key];
-                    return;
-                }
-                // 2) Fallback: terjemahan offline (perilaku lama)
-                const pageKeys = Object.keys(OFFLINE_QURAN);
-                let tafsirText = null;
-                for (const pg of pageKeys) {
+                // 1) Arab + terjemah offline (OFFLINE_QURAN, selalu tersedia)
+                let ayahData = null;
+                for (const pg of Object.keys(OFFLINE_QURAN)) {
                     const found = OFFLINE_QURAN[pg].find(x => x.s === s && x.a === a);
-                    if (found) { tafsirText = found.trans; break; }
+                    if (found) { ayahData = found; break; }
                 }
-                if (tafsirText) {
-                    document.getElementById('tafsir-loader').style.display='none';
-                    document.getElementById('tafsir-content-box').style.display='block';
-                    const indoName2 = SURAH_META[s-1][0];
-                    document.getElementById('tafsir-meta').innerText = `QS. ${indoName2} • Ayat ${a}`;
-                    document.getElementById('tafsir-body').innerText = tafsirText;
-                    return;
+                // 2) Tafsir Jalalain offline (tafsir-jalalain.json, load sekali + cache)
+                const jl = await ensureTafsirDB();
+                const tafsirText = (jl && jl[key]) ? jl[key] : null;
+                // 3) Fallback: terjemah online bila data offline tak ada
+                if (!ayahData) {
+                    const r = await fetch(`https://api.alquran.cloud/v1/ayah/${s}:${a}/id.indonesian`);
+                    const d = await r.json();
+                    ayahData = { arab: '', trans: d.data.text };
                 }
-                const r=await fetch(`https://api.alquran.cloud/v1/ayah/${s}:${a}/id.indonesian`);
-                const d=await r.json();
+                const arab = (ayahData && ayahData.arab) ? ayahData.arab : '';
+                const trans = (ayahData && ayahData.trans) ? ayahData.trans : '';
                 document.getElementById('tafsir-loader').style.display='none';
                 document.getElementById('tafsir-content-box').style.display='block';
                 const indoName = SURAH_META[s-1][0];
-                document.getElementById('tafsir-meta').innerText = `Juz ${d.data.juz} • QS. ${indoName} • Ayat ${a}`;
-                document.getElementById('tafsir-body').innerText=d.data.text;
+                document.getElementById('tafsir-meta').innerText = `QS. ${indoName} • Ayat ${a}`;
+                // 4) Render satu gulir berlabel: arab → TERJEMAHAN → TAFSIR JALALAIN
+                let html = '';
+                if (arab) html += `<div style="font-family:var(--arabic-font),'Scheherazade New',serif; direction:rtl; text-align:right; font-size:1.35rem; line-height:2.1; margin-bottom:16px;">${escHtml(arab)}</div>`;
+                if (trans) html += `<div style="margin-bottom:16px;"><div style="font-size:0.72rem; font-weight:700; color:var(--accent-color); letter-spacing:0.08em; margin-bottom:5px;">TERJEMAHAN</div><div style="font-size:0.95rem; line-height:1.65;">${escHtml(trans)}</div></div>`;
+                if (tafsirText) {
+                    html += `<div><div style="font-size:0.72rem; font-weight:700; color:var(--accent-color); letter-spacing:0.08em; margin-bottom:5px;">TAFSIR JALALAIN</div><div style="font-size:0.95rem; line-height:1.65; text-align:justify;">${escHtml(tafsirText)}</div></div>`;
+                } else {
+                    html += `<div style="font-size:0.85rem; opacity:0.7; font-style:italic;">Tafsir Jalalain tidak tersedia untuk ayat ini.</div>`;
+                }
+                document.getElementById('tafsir-body').innerHTML = html;
+                // Simpan utk tombol Salin (arab + terjemah + tafsir)
+                _tafsirCur = { arab: arab, trans: trans, tafsir: tafsirText || '' };
             }catch(e){ document.getElementById('tafsir-loader').innerText="Gagal/Offline"; }
         }
+        // Escape HTML minimal utk teks data yang di-inject via innerHTML
+        function escHtml(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
         // Navigasi tafsir: delta=+1 ayat berikutnya, delta=-1 ayat sebelumnya (lintas surat, berhenti di ujung)
         function tafsirNav(delta){
             var s = selectedAyah.s, a = selectedAyah.a + delta;
@@ -2637,7 +2640,7 @@
             }, {passive:true});
         })();
         // Tafsir Jalalain offline — file tafsir-jalalain.json (2.65 MB, 6.236 ayat), dimuat sekali & di-cache
-        var _tafsirDB = null, _tafsirLoading = null;
+        var _tafsirDB = null, _tafsirLoading = null, _tafsirCur = {arab:'',trans:'',tafsir:''};
         function ensureTafsirDB(){
             if(_tafsirDB) return Promise.resolve(_tafsirDB);
             if(_tafsirLoading) return _tafsirLoading;
@@ -2650,11 +2653,13 @@
         }
 
         function copyTafsirContent() {
-            const domId = `ayah-${selectedAyah.s}-${selectedAyah.a}`;
-            const arabicEl = document.querySelector(`#${domId} .dynamic-font`);
-            const arabicText = arabicEl ? arabicEl.innerText : "";
-            const translation = document.getElementById('tafsir-body').innerText;
-            navigator.clipboard.writeText(`${arabicText}\n\n${translation}`).then(() => { closeModal('tafsir-modal'); showToast(); });
+            const t = _tafsirCur || {arab:'',trans:'',tafsir:''};
+            const parts = [];
+            if (t.arab) parts.push(t.arab);
+            if (t.trans) parts.push('Terjemahan: ' + t.trans);
+            if (t.tafsir) parts.push('Tafsir Jalalain: ' + t.tafsir);
+            const text = parts.join('\n\n');
+            navigator.clipboard.writeText(text).then(() => { closeModal('tafsir-modal'); showToast(); });
         }
 
         // --- NEW COPY MENU LOGIC ---
@@ -3843,7 +3848,7 @@ var STEPS = [
      body: '<b>Demo:</b> kami bukakan contoh bacaan (QS. Al-Kahf 18:60). Perhatikan <b>bar atas</b> yang menampilkan info <b>surah \u00b7 halaman \u00b7 ayat</b>. Tombolnya: \uD83C\uDF10 terjemahan, \uD83D\uDD0D <b>Navigasi Ayat</b>, \u2B07 auto-scroll. Ketuk <b>\u2190</b> untuk kembali ke menu.'},
     {target: null, demo: 'sample',
      title: '\uD83D\uDC49 Saat Membaca (2/2)',
-     body: '<b>Ketuk ayat mana pun</b> untuk membuka menu: \uD83D\uDCD6 Tafsir/Terjemah, \uD83D\uDCCD Bookmark ayat, \uD83D\uDCCB Salin ayat, \uD83D\uDD0A Putar audio murattal (Misyari Rasyid). Ketuk ayat lagi untuk menghapus highlight. <b>Lanjutkan</b> untuk kembali ke menu.'},
+     body: '<b>Ketuk ayat mana pun</b> untuk membuka menu: \uD83D\uDCD6 Terjemah &amp; Tafsir, \uD83D\uDCCD Bookmark ayat, \uD83D\uDCCB Salin ayat, \uD83D\uDD0A Putar audio murattal (Misyari Rasyid). Ketuk ayat lagi untuk menghapus highlight. <b>Lanjutkan</b> untuk kembali ke menu.'},
     {target: '.hero-actions button[onclick*="openBookmarkList"]',
      title: '\uD83D\uDCCD Bookmark',
      body: 'Kumpulan ayat yang kamu tandai. <b>Ketuk bookmark</b> untuk langsung melompat ke ayat itu (presisi ke halaman yang benar). Tombol \u2715 untuk menghapus.'},

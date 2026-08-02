@@ -1,5 +1,18 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.5.1 (Agustus 2026)
+
+- **Perbaikan: modal "Tafsir/Terjemah" kini benar-benar menampilkan
+  TERJEMAH + TAFSIR.** Sebelumnya modal (long-press ayat) hanya menampilkan
+  tafsir, padahal tombolnya menjanjikan keduanya. Sekarang dalam satu gulir
+  berlabel tegas: teks arab ayat → **TERJEMAHAN** → **TAFSIR JALALAIN**,
+  sehingga tidak tertukar antara makna ayat (terjemah) dan penjelasannya
+  (tafsir). Tombol long-press & judul modal diubah jadi "Terjemah & Tafsir".
+  Navigasi ◀ ▶ / swipe lintas ayat tetap berfungsi, dan tombol Salin kini
+  menyalin arab + terjemah + tafsir sekaligus (sebelumnya salah menyalin
+  tafsir sebagai "terjemahan"). Data terjemah diambil dari data offline yang
+  sudah ada (OFFLINE_QURAN); fallback API online tetap ada.
+
 ## v3.5.0 (Agustus 2026)
 
 - **Fitur baru: navigasi di Tafsir Jalalain.** Geser horizontal pada konten
