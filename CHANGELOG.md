@@ -1,5 +1,15 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.4.7 (Agustus 2026)
+
+- **Fix: kotak pemilihan lokasi tidak full width / tidak sejajar.**
+  Kotak daftar hasil search (`#pm-city-list`) tidak punya `width:100%`
+  eksplisit → tidak selebar input pencarian & setting-group lain. Kini
+  `width:100%` + `box-sizing:border-box`. Item di dalamnya juga diubah ke
+  `display:flex; align-items:center; justify-content:center` (emoji + nama
+  kota benar-benar di tengah) dan item terakhir tanpa border bawah (anti
+  garis dobel).
+
 ## v3.4.6 (Agustus 2026)
 
 - **Fix: nama surat di modal Salin Ayat tidak konsisten dgn index.**

@@ -1429,7 +1429,7 @@
                 <div class="setting-group" id="pm-city-wrap" style="display:none; margin-bottom:12px;">
                     <b>Kota / Kabupaten</b>
                     <input type="text" id="pm-city-search" placeholder="Cari kota…" oninput="filterPrayerCities(this.value)" style="width:100%; margin-top:8px; padding:9px 12px; border:1.5px solid var(--border); border-radius:10px; background:var(--bg-elevated); color:var(--text); font-size:0.85rem; outline:none;">
-                    <div id="pm-city-list" style="max-height:160px; overflow-y:auto; margin-top:8px; border:1px solid var(--border); border-radius:10px; background:var(--bg-elevated);"></div>
+                    <div id="pm-city-list" style="width:100%; box-sizing:border-box; max-height:160px; overflow-y:auto; margin-top:8px; border:1px solid var(--border); border-radius:10px; background:var(--bg-elevated);"></div>
                 </div>
 
                 <div class="setting-group" style="margin-bottom:14px;">
@@ -3633,9 +3633,9 @@ function renderCityList(q){
     ensureCityDB(function(db){
         var list = db.filter(function(c){ return c.name.toLowerCase().indexOf(ql) >= 0; });
         box.innerHTML = '';
-        list.forEach(function(c){
+        list.forEach(function(c, i){
             var div = document.createElement('div');
-            div.style.cssText = 'padding:12px 14px; cursor:pointer; text-align:center; color:var(--text); font-size:0.85rem; border-bottom:1px solid var(--border); transition:background .15s;';
+            div.style.cssText = 'display:flex; align-items:center; justify-content:center; gap:6px; padding:13px 14px; cursor:pointer; color:var(--text); font-size:0.85rem; text-align:center; border-bottom:' + (i === list.length-1 ? 'none' : '1px solid var(--border)') + '; transition:background .15s;';
             div.textContent = '🏙️ ' + c.name;
             div.onmouseenter = function(){ div.style.background = 'var(--bg-card)'; };
             div.onmouseleave = function(){ div.style.background = 'transparent'; };
