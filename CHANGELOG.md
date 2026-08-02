@@ -1,5 +1,13 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.4.8 (Agustus 2026)
+
+- **Fix: modal Jadwal Shalat tidak full width di layar lebar.**
+  Modal ini satu-satunya yang punya `max-width:420px` inline (sisa desain
+  lama) → di layar >420px muncul margin kiri-kanan, tidak sejajar dgn modal
+  lain. Batas itu dihapus → ikut aturan umum: full width di HP, max-width
+  560px hanya di tablet (≥768px).
+
 ## v3.4.7 (Agustus 2026)
 
 - **Fix: kotak pemilihan lokasi tidak full width / tidak sejajar.**
