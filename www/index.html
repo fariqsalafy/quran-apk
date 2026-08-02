@@ -3706,6 +3706,11 @@ window.setPrayerMode = setPrayerMode;
 window.filterPrayerCities = filterPrayerCities;
 window.toggleAdzanNotif = toggleAdzanNotif;
 window.refreshPrayer = refreshPrayer;
+// ekspos utk tutorial (demo sample ayat)
+window.initRead = initRead;
+window.closeReader = closeReader;
+window.scrollToAyah = scrollToAyah;
+window.pageOfAyah = pageOfAyah;
 })();
 </script>
 
@@ -3738,12 +3743,12 @@ var STEPS = [
     {target: '#list-surah',
      title: '\uD83D\uDCD6 Mulai Membaca',
      body: 'Ketuk nama surah untuk membuka halaman baca. Teks Arab tampil seperti mushaf (IndoPak atau Rasm Utsmani, bisa diganti di Pengaturan).'},
-    {target: null,
+    {target: null, demo: 'sample',
      title: '\uD83D\uDC49 Saat Membaca (1/2)',
-     body: 'Bar atas menampilkan info <b>surah \u00b7 halaman \u00b7 ayat</b>. Tombolnya: \uD83C\uDF10 terjemahan, \uD83D\uDD0D <b>Navigasi Ayat</b> (langsung lompat ke surah+ayat tertentu), dan \u2B07 auto-scroll untuk baca berjalan. Ketuk <b>\u2190</b> untuk kembali ke menu.'},
-    {target: null,
+     body: '<b>Demo:</b> kami bukakan contoh bacaan (QS. Al-Kahf 18:60). Perhatikan <b>bar atas</b> yang menampilkan info <b>surah \u00b7 halaman \u00b7 ayat</b>. Tombolnya: \uD83C\uDF10 terjemahan, \uD83D\uDD0D <b>Navigasi Ayat</b>, \u2B07 auto-scroll. Ketuk <b>\u2190</b> untuk kembali ke menu.'},
+    {target: null, demo: 'sample',
      title: '\uD83D\uDC49 Saat Membaca (2/2)',
-     body: '<b>Ketuk ayat mana pun</b> untuk membuka menu: \uD83D\uDCD6 Tafsir/Terjemah, \uD83D\uDCCD Bookmark ayat, \uD83D\uDCCB Salin ayat, \uD83D\uDD0A Putar audio murattal (Misyari Rasyid). Ketuk ayat lagi untuk menghapus highlight.'},
+     body: '<b>Ketuk ayat mana pun</b> untuk membuka menu: \uD83D\uDCD6 Tafsir/Terjemah, \uD83D\uDCCD Bookmark ayat, \uD83D\uDCCB Salin ayat, \uD83D\uDD0A Putar audio murattal (Misyari Rasyid). Ketuk ayat lagi untuk menghapus highlight. <b>Lanjutkan</b> untuk kembali ke menu.'},
     {target: '.hero-actions button[onclick*="openBookmarkList"]',
      title: '\uD83D\uDCCD Bookmark',
      body: 'Kumpulan ayat yang kamu tandai. <b>Ketuk bookmark</b> untuk langsung melompat ke ayat itu (presisi ke halaman yang benar). Tombol \u2715 untuk menghapus.'},
@@ -3801,23 +3806,58 @@ function showStep(){
     var prv = document.getElementById('t-prev');
     if(prv) prv.onclick = function(){ cur--; showStep(); };
 
+    // keluar dari mode demo -> tutup reader biar menu terlihat
+    var prev = (cur > 0) ? STEPS[cur-1] : null;
+    if(prev && prev.demo && !s.demo) closeDemoReader();
+
+    // masuk mode demo -> buka sample ayat
+    if(s.demo === 'sample') openDemoSample();
+
     positionRing(s.target);
+}
+
+function closeDemoReader(){
+    try{ if(window.closeReader) window.closeReader(); }catch(e){}
+}
+
+function openDemoSample(){
+    // buka QS. Al-Kahf 18:60 (hal. 300) sebagai contoh bacaan
+    try{
+        var p = window.pageOfAyah ? window.pageOfAyah(18, 60) : 300;
+        if(window.initRead){
+            window.initRead(p).then(function(){
+                setTimeout(function(){
+                    if(window.scrollToAyah) window.scrollToAyah(18, 60, {center: true, highlight: true});
+                }, 250);
+            });
+        }
+    }catch(e){}
 }
 
 function positionRing(target){
     if(!target){ ring.style.display = 'none'; placeCardCenter(); return; }
-    var el = document.querySelector(target);
-    if(!el){ ring.style.display = 'none'; placeCardCenter(); return; }
-    el.scrollIntoView({block: 'center', behavior: 'smooth'});
-    setTimeout(function(){
-        var r = el.getBoundingClientRect();
-        ring.style.display = 'block';
-        ring.style.left = (r.left - 5) + 'px';
-        ring.style.top = (r.top - 5) + 'px';
-        ring.style.width = (r.width + 10) + 'px';
-        ring.style.height = (r.height + 10) + 'px';
-        placeCardBelow(r);
-    }, 350);
+    var tries = 0;
+    var attempt = function(){
+        var el = document.querySelector(target);
+        if(!el){
+            if(++tries < 15){ setTimeout(attempt, 150); return; }  // polling elemen
+            ring.style.display = 'none'; placeCardCenter(); return;
+        }
+        el.scrollIntoView({block: 'center', behavior: 'auto'});   // instan, tanpa smooth
+        // tunggu 2 frame layout stabil, lalu hitung posisi
+        requestAnimationFrame(function(){
+            requestAnimationFrame(function(){
+                var r = el.getBoundingClientRect();
+                ring.style.display = 'block';
+                ring.style.left = (r.left - 5) + 'px';
+                ring.style.top = (r.top - 5) + 'px';
+                ring.style.width = (r.width + 10) + 'px';
+                ring.style.height = (r.height + 10) + 'px';
+                placeCardBelow(r);
+            });
+        });
+    };
+    attempt();
 }
 
 function placeCardBelow(r){
@@ -3826,6 +3866,9 @@ function placeCardBelow(r){
     var left = Math.max(10, Math.min(window.innerWidth - cw - 10, r.left + r.width/2 - cw/2));
     var top = r.bottom + 14;
     if(top + ch > window.innerHeight - 10) top = Math.max(10, r.top - ch - 14);
+    // clamp: pastikan kartu selalu dalam layar (anti "stack"/tak terlihat)
+    left = Math.max(10, Math.min(left, window.innerWidth - cw - 10));
+    top = Math.max(10, Math.min(top, window.innerHeight - ch - 10));
     card.style.left = left + 'px';
     card.style.top = top + 'px';
 }
@@ -3839,6 +3882,7 @@ function placeCardCenter(){
 
 function finish(){
     try{ localStorage.setItem('quranProTutorialSeen', TUTORIAL_MAJOR); }catch(e){}
+    closeDemoReader();
     ov.classList.remove('show');
     ring.style.display = 'none';
     card.style.display = 'none';
@@ -3847,6 +3891,7 @@ function finish(){
 function openTutorial(){
     ensureEl();
     cur = 0;
+    closeDemoReader();   // mulai dari menu (hero) biar langkah pertama terlihat
     ov.classList.add('show');
     showStep();
 }

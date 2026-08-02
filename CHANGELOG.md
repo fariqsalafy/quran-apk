@@ -1,5 +1,20 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.4.1 (Agustus 2026)
+
+- **Fix tutorial macet (stack)**: posisi ring/kartu dihitung setelah
+  `scrollIntoView smooth` dengan `setTimeout 350ms` — di HP scroll smooth bisa
+  >350ms sehingga koordinat elemen salah dan kartu keluar layar (tombol tak
+  bisa disentuh). Kini: scroll instan (`behavior:auto`) + posisi dihitung
+  setelah 2 frame (`requestAnimationFrame`) + polling elemen + clamp kartu
+  selalu dalam layar.
+- **Demo sample ayat**: langkah "Saat Membaca (1/2)" & "(2/2)" kini membuka
+  contoh bacaan sungguhan (QS. Al-Kahf 18:60, hal. 300) dengan ayat
+  ter-highlight — bukan sekadar kartu teks. Keluar dari langkah demo otomatis
+  menutup reader & kembali ke menu.
+- Fungsi reader (`initRead`, `closeReader`, `scrollToAyah`, `pageOfAyah`)
+  diekspos ke `window` untuk keperluan tutorial.
+
 ## v3.4.0 (Agustus 2026)
 
 - **Fitur baru: Tutorial / Tour interaktif** (vanilla JS, offline, tema app).
