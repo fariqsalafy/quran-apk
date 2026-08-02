@@ -1,5 +1,17 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.4.0 (Agustus 2026)
+
+- **Fitur baru: Tutorial / Tour interaktif** (vanilla JS, offline, tema app).
+  - 12 langkah mencakup SEMUA fitur: jadwal shalat (lokasi + notif adzan),
+    lanjutkan membaca, progres tilawah, pencarian & tab surah/juz, cara baca,
+    navigasi ayat, tafsir/bookmark/salin/audio, pengaturan lengkap, tombol bantuan.
+  - Muncul otomatis saat **pertama buka** dan saat **versi major naik**
+    (3→4, dst — dikontrol konstanta `TUTORIAL_MAJOR`).
+  - Tombol **?** di hero untuk membuka kembali kapan saja.
+  - Highlight elemen dengan cincin emas + kartu penjelasan + titik progres +
+    tombol Berikutnya/Lewati.
+
 ## v3.3.5 (Agustus 2026)
 
 - **Fix hero jadwal tidak full-width**: `.hero-stats` masih `display: flex`
