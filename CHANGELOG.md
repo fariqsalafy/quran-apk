@@ -1,5 +1,17 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.4.2 (Agustus 2026)
+
+- **Fix: preview font di Pengaturan menutupi modal.** Saat slider ukuran teks
+  digeser besar (60-120px), kotak preview Arab membesar tanpa batas
+  (`updateFontPreview` memakai `v` polos) dan area preview `flex-shrink:0`
+  mendorong panel hingga 92vh — slider & tombol Tutup terdorong keluar layar
+  (tidak bisa mengecilkan / keluar). Perbaikan:
+  - `updateFontPreview` kini membatasi preview `Math.min(v, 38)` — konsisten
+    dengan `applyConfig`.
+  - `.font-preview` diberi `max-height: 150px; overflow-y: auto` sebagai
+    pengaman.
+
 ## v3.4.1 (Agustus 2026)
 
 - **Fix tutorial macet (stack)**: posisi ring/kartu dihitung setelah

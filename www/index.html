@@ -998,9 +998,10 @@
 
         .font-preview {
             width: 100%; min-height: 90px; height: auto;
+            max-height: 150px; overflow-y: auto;   /* pengaman: preview tak pernah menutupi modal */
             box-sizing: border-box;
             padding: 16px 14px 20px;
-            display: block; position: relative; overflow: visible;
+            display: block; position: relative; overflow-x: visible;
             background: var(--bg-elevated);
             border-radius: 12px; text-align: var(--text-align, center); direction: rtl;
             font-family: var(--arabic-font); line-height: 2.3;
@@ -1771,8 +1772,9 @@
             document.getElementById('font-disp').innerText = v + 'px';
             document.documentElement.style.setProperty('--arabic-font-size', v + 'px');
             // Update inline style on preview-box too (overrides applyConfig inline style)
+            // DIBATASI 38px — konsisten dgn applyConfig; cegah preview menutupi modal
             const pb = document.getElementById('preview-box');
-            if (pb) pb.style.fontSize = v + 'px';
+            if (pb) pb.style.fontSize = Math.min(v, 38) + 'px';
         }
 
         function setMode(m){
