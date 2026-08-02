@@ -1429,7 +1429,7 @@
                 <div class="setting-group" id="pm-city-wrap" style="display:none; margin-bottom:12px;">
                     <b>Kota / Kabupaten</b>
                     <input type="text" id="pm-city-search" placeholder="Cari kota…" oninput="filterPrayerCities(this.value)" style="width:100%; margin-top:8px; padding:9px 12px; border:1.5px solid var(--border); border-radius:10px; background:var(--bg-elevated); color:var(--text); font-size:0.85rem; outline:none;">
-                    <div id="pm-city-list" style="max-height:160px; overflow-y:auto; margin-top:8px; border:1px solid var(--border); border-radius:10px;"></div>
+                    <div id="pm-city-list" style="max-height:160px; overflow-y:auto; margin-top:8px; border:1px solid var(--border); border-radius:10px; background:var(--bg-elevated);"></div>
                 </div>
 
                 <div class="setting-group" style="margin-bottom:14px;">
@@ -2548,8 +2548,10 @@
             const m = document.getElementById('ayah-modal');
             const c = document.getElementById('ayah-modal-content');
             const isBm = bookmarks.has(`${selectedAyah.s}:${selectedAyah.a}`);
+            // Nama surat konsisten dgn index: SURAH_META (ejaan Indonesia), bukan englishName dari data API
+            const sNameId = (SURAH_META[selectedAyah.s-1] || [])[0] || selectedAyah.n || ('Surah ' + selectedAyah.s);
             c.innerHTML = `
-                <h3 style="color:var(--accent-color);margin-bottom:5px;">QS. ${selectedAyah.n}</h3>
+                <h3 style="color:var(--accent-color);margin-bottom:5px;">QS. ${sNameId}</h3>
                 <div style="font-size:0.9rem;opacity:0.7;margin-bottom:20px;">Ayat ${selectedAyah.a}</div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                     <button class="option-btn" style="justify-content:center;" onclick="triggerTafsir()">📖 Tafsir/Terjemah</button>
@@ -3558,6 +3560,12 @@ function loadPrayer(lat, lng, cityId, key, status){
     }
 }
 function hisabFallback(lat, lng, key, status){
+    // Kota dari API (di luar 53 lokal) tidak punya koordinat -> hisab tidak bisa; beri pesan jelas
+    if(lat == null || lng == null){
+        pState.times = null; pState.source = 'NONE'; pState.dateKey = key; savePrayerState();
+        if(status) status.textContent = '⚠️ Kota ini butuh koneksi pertama kali — jadwal belum tersimpan offline.';
+        return;
+    }
     var date = getToday();
     pState.times = computeHisab(date, lat, lng);
     pState.lat = lat; pState.lng = lng;
@@ -3590,27 +3598,58 @@ function setPrayerMode(m){
     document.getElementById('pm-city-wrap').style.display = m==='manual' ? 'block' : 'none';
     if(m==='auto') refreshPrayer();
 }
+/* ── Database kota: 53 lokal (dgn koordinat utk hisab) + 518 dari API MyQuran ── */
+var CITY_DB = null;
+var CITY_DB_STORE = 'quranProCities_v1';
+function cityTitle(s){
+    // "KAB. WONOGIRI" -> "Wonogiri", "KOTA BANDAR LAMPUNG" -> "Bandar Lampung"
+    return String(s||'').replace(/^(KAB\.|KOTA)\s+/i, '')
+        .toLowerCase().replace(/(^|\s)(\S)/g, function(m,sp,c){ return sp + c.toUpperCase(); });
+}
+function ensureCityDB(cb){
+    if(CITY_DB) return cb(CITY_DB);
+    try{
+        var s = localStorage.getItem(CITY_DB_STORE);
+        if(s){ CITY_DB = JSON.parse(s); return cb(CITY_DB); }
+    }catch(e){}
+    fetch('https://api.myquran.com/v2/sholat/kota/semua', {mode:'cors'})
+        .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+        .then(function(j){
+            var api = (j && j.data || []).map(function(k){ return {id:k.id, name:cityTitle(k.lokasi), lat:null, lng:null}; });
+            var byId = {};
+            api.forEach(function(c){ byId[c.id] = c; });
+            PRAYER_CITIES.forEach(function(c){ byId[c.id] = c; }); // lokal menang (ada lat/lng utk hisab)
+            CITY_DB = Object.keys(byId).map(function(id){ return byId[id]; });
+            try{ localStorage.setItem(CITY_DB_STORE, JSON.stringify(CITY_DB)); }catch(e2){}
+            cb(CITY_DB);
+        })
+        .catch(function(){ CITY_DB = PRAYER_CITIES; cb(CITY_DB); }); // offline: 53 lokal
+}
 function renderCityList(q){
     var box = document.getElementById('pm-city-list');
+    if(!box) return;
     var ql = (q||'').toLowerCase();
-    var list = PRAYER_CITIES.filter(function(c){ return c.name.toLowerCase().indexOf(ql) >= 0; });
-    box.innerHTML = '';
-    list.forEach(function(c){
-        var div = document.createElement('div');
-        div.style.cssText = 'padding:9px 12px; cursor:pointer; border-radius:8px; font-size:0.85rem;';
-        div.textContent = '🏙️ ' + c.name;
-        div.onmouseenter = function(){ div.style.background = 'var(--bg-elevated)'; };
-        div.onmouseleave = function(){ div.style.background = 'transparent'; };
-        div.onclick = function(){
-            pState.cityId = c.id; pState.cityName = c.name;
-            pState.lat = c.lat; pState.lng = c.lng;
-            savePrayerState();
-            prefetchPrayerYear(c.id);   // unduh 12 bulan utk offline 0%
-            refreshPrayer();
-        };
-        box.appendChild(div);
+    box.innerHTML = '<div style="padding:12px; font-size:0.8rem; opacity:0.6; text-align:center;">Memuat daftar kota…</div>';
+    ensureCityDB(function(db){
+        var list = db.filter(function(c){ return c.name.toLowerCase().indexOf(ql) >= 0; });
+        box.innerHTML = '';
+        list.forEach(function(c){
+            var div = document.createElement('div');
+            div.style.cssText = 'padding:12px 14px; cursor:pointer; text-align:center; color:var(--text); font-size:0.85rem; border-bottom:1px solid var(--border); transition:background .15s;';
+            div.textContent = '🏙️ ' + c.name;
+            div.onmouseenter = function(){ div.style.background = 'var(--bg-card)'; };
+            div.onmouseleave = function(){ div.style.background = 'transparent'; };
+            div.onclick = function(){
+                pState.cityId = c.id; pState.cityName = c.name;
+                pState.lat = c.lat; pState.lng = c.lng;
+                savePrayerState();
+                prefetchPrayerYear(c.id);   // unduh 12 bulan utk offline 0%
+                refreshPrayer();
+            };
+            box.appendChild(div);
+        });
+        if(!list.length) box.innerHTML = '<div style="padding:14px; font-size:0.8rem; opacity:0.5; text-align:center;">Kota tidak ditemukan — coba ejaan lain atau pilih kota terdekat.</div>';
     });
-    if(!list.length) box.innerHTML = '<div style="padding:9px; font-size:0.8rem; opacity:0.5;">Kota tidak ditemukan</div>';
 }
 function filterPrayerCities(v){ renderCityList(v); }
 

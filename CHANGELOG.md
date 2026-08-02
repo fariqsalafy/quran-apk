@@ -1,5 +1,22 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.4.6 (Agustus 2026)
+
+- **Fix: nama surat di modal Salin Ayat tidak konsisten dgn index.**
+  Long-press ayat → modal menampilkan `QS. ${selectedAyah.n}` yang berasal
+  dari `sNameEng` data API (ejaan Inggris: "Al-Faatiha", "Yaseen"). Kini
+  memakai `SURAH_META` (ejaan Indonesia: "Al-Fatihah", "Yasin") — konsisten
+  dengan daftar surat, header baca, tafsir, bookmark & teks copy.
+- **Fix: search kota manual tidak menemukan kota di luar 53 daftar.**
+  Database kota kini digabung: 53 lokal (dgn koordinat utk hisab) + 518
+  kota/kabupaten dari API MyQuran (`/sholat/kota/semua`), di-cache di
+  localStorage. Nama dinormalisasi ("KAB. WONOGIRI" → "Wonogiri"). Kota
+  dari API tanpa koordinat: jadwal via API + cache 12 bln; fallback hisab
+  menampilkan pesan jelas (bukan NaN) saat offline total.
+- **Fix: tampilan dropdown hasil search kota** — item rata tengah, warna
+  tema, hover, pemisah antar item, container berlatar, pesan "tidak
+  ditemukan" di-center + saran.
+
 ## v3.4.5 (Agustus 2026)
 
 - **Fix: ukuran teks "kembali" ke nilai lama setelah diubah.** Slider Ukuran
