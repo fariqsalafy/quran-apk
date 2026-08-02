@@ -1743,7 +1743,7 @@
             const fontLockSwitch=document.getElementById('font-lock-toggle');if(fontLockSwitch)fontLockSwitch.checked=userConfig.fontLock;
             const fs=document.getElementById('font-slider');if(fs)fs.value=parseInt(userConfig.fontSize);
             const fd=document.getElementById('font-disp');if(fd)fd.innerText=userConfig.fontSize+'px';
-            const pb=document.getElementById('preview-box');if(pb)pb.style.fontSize=Math.min(userConfig.fontSize,38)+'px';
+            const pb=document.getElementById('preview-box');if(pb)pb.style.fontSize=userConfig.fontSize+'px';
 
             updatePreviewText();
             updateBarPositionClass();
@@ -1771,10 +1771,10 @@
             userConfig.fontSize = v;
             document.getElementById('font-disp').innerText = v + 'px';
             document.documentElement.style.setProperty('--arabic-font-size', v + 'px');
-            // Update inline style on preview-box too (overrides applyConfig inline style)
-            // DIBATASI 38px — konsisten dgn applyConfig; cegah preview menutupi modal
+            // Preview ikut slider penuh (20-120px). Modal tetap aman karena
+            // .font-preview punya max-height:150px + overflow-y:auto (pengaman CSS).
             const pb = document.getElementById('preview-box');
-            if (pb) pb.style.fontSize = Math.min(v, 38) + 'px';
+            if (pb) pb.style.fontSize = v + 'px';
         }
 
         function setMode(m){

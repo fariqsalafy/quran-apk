@@ -1,5 +1,14 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.4.3 (Agustus 2026)
+
+- **Fix: preview ukuran font tidak berubah saat slider digeser.** Cap 38px
+  dari v3.4.2 membuat preview mati (default font 70px > 38px, jadi geser ke
+  kanan tidak terlihat). Preview kini mengikuti slider penuh (20-120px);
+  keamanan modal ditangani pengaman CSS `.font-preview` (`max-height:150px;
+  overflow-y:auto`) — modal tidak akan pernah tertutup preview raksasa.
+- Fix ini menggantikan pendekatan v3.4.2 (cap di JS) dengan pengaman di CSS.
+
 ## v3.4.2 (Agustus 2026)
 
 - **Fix: preview font di Pengaturan menutupi modal.** Saat slider ukuran teks
