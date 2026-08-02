@@ -1,5 +1,15 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.4.9 (Agustus 2026)
+
+- **Fitur baru: Tafsir Jalalain full offline.** Modal "Tafsir/Terjemah"
+  (long-press ayat) kini menampilkan Tafsir Al-Jalalain — 6.236 ayat lengkap
+  (0 kosong). Data di file terpisah `tafsir-jalalain.json` (2.65 MB, sumber:
+  renomureza/quran-api-id, lisensi MIT) dimuat on-demand sekali & di-cache.
+  Fallback berlapis: Jalalain → terjemahan offline → API online (perilaku
+  lama) jika file tafsir tidak tersedia. Judul modal & atribusi di "Tentang
+  Aplikasi" diperbarui.
+
 ## v3.4.8 (Agustus 2026)
 
 - **Fix: modal Jadwal Shalat tidak full width di layar lebar.**
