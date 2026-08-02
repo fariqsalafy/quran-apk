@@ -1,5 +1,14 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.4.4 (Agustus 2026)
+
+- **Fix: jadwal shalat hang saat offline / jaringan lambat.** `fetchMonthAPI`
+  tidak punya timeout — saat offline atau jaringan lambat, fetch menunggu lama
+  sebelum jatuh ke hisab lokal; prefetch 12 bulan berarti hingga 12 request
+  hang paralel. Kini ada `AbortController` timeout 8 detik: request gagal
+  cepat → langsung pakai cache/hisab. Ditemukan Agen-1 (workflow paralel 3
+  agen, 2 Agustus 2026).
+
 ## v3.4.3 (Agustus 2026)
 
 - **Fix: preview ukuran font tidak berubah saat slider digeser.** Cap 38px

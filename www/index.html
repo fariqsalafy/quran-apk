@@ -3409,12 +3409,17 @@ function computeHisab(date, lat, lng){
 /* ── API MyQuran (sumber jadwal Kemenag RI) ── */
 function fetchMonthAPI(cityId, y, m){
     var mm = (m < 10 ? '0' : '') + m;
-    return fetch('https://api.myquran.com/v2/sholat/jadwal/' + cityId + '/' + y + '/' + mm, {mode:'cors'})
+    // timeout 8 detik: offline/lambat -> cepat jatuh ke cache/hisab (cegah hang)
+    var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, 8000) : null;
+    return fetch('https://api.myquran.com/v2/sholat/jadwal/' + cityId + '/' + y + '/' + mm,
+            {mode:'cors', signal: ctrl ? ctrl.signal : undefined})
         .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
         .then(function(j){
             if(!j || !j.data || !j.data.jadwal) throw new Error('Data kosong');
             return j.data.jadwal;
-        });
+        })
+        .finally(function(){ if(timer) clearTimeout(timer); });
 }
 /* Prefetch 12 bulan ke depan -> cache (offline = snapshot online, selisih 0%) */
 function prefetchPrayerYear(cityId){
