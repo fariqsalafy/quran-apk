@@ -1401,7 +1401,7 @@
                         </div>
                     </div>
                     </div>
-                <div class="setting-group"><b>Mode Offline</b><div class="download-box"><div id="dl-container"><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-size:0.9rem; font-weight:600;">Status Data</span><button class="option-btn" style="width:auto; padding:8px 15px; margin:0; background:var(--accent-color); color:white;" onclick="downloadOfflineData()">Unduh</button></div><div style="font-size:0.75rem; opacity:0.7; margin-top:5px;">Unduh teks sesuai Rasm saat ini.</div></div><div id="dl-progress" class="progress-bar"><div id="dl-fill" class="progress-fill"></div></div><div id="dl-status" class="download-status"></div><div style="border-top:1px dashed var(--border); margin:14px 0 10px;"></div><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-size:0.9rem; font-weight:600;">Audio Murattal</span><button id="adl-btn" class="option-btn" style="width:auto; padding:8px 15px; margin:0; background:var(--accent-color); color:white;" onclick="downloadAllAudio()">Unduh</button></div><div style="font-size:0.75rem; opacity:0.7; margin-top:5px;">Qari Misyari Rasyid Al-'Afasy — 1 Al-Qur'an penuh (± 500 MB). Bisa dijeda &amp; otomatis lanjut.</div><div id="adl-progress" class="progress-bar"><div id="adl-fill" class="progress-fill"></div></div><div id="adl-status" class="download-status"></div><div style="text-align:right; margin-top:4px;"><span onclick="deleteAllAudio()" style="font-size:0.7rem; opacity:0.55; text-decoration:underline; cursor:pointer;">Hapus audio offline</span></div></div></div>
+                <div class="setting-group"><b>Mode Offline</b><div class="download-box"><div style="font-size:0.75rem; opacity:0.7; margin-bottom:12px;">Teks Al-Qur'an &amp; terjemahan sudah offline otomatis (tertanam di app) — yang perlu diunduh hanya <b>audio</b>.</div><div style="border-top:1px dashed var(--border); margin:0 0 10px;"></div><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-size:0.9rem; font-weight:600;">Audio Murattal</span><button id="adl-btn" class="option-btn" style="width:auto; padding:8px 15px; margin:0; background:var(--accent-color); color:white;" onclick="downloadAllAudio()">Unduh</button></div><div style="font-size:0.75rem; opacity:0.7; margin-top:5px;">Qari Misyari Rasyid Al-'Afasy — 1 Al-Qur'an penuh (± 500 MB). Bisa dijeda &amp; otomatis lanjut.</div><div id="adl-progress" class="progress-bar"><div id="adl-fill" class="progress-fill"></div></div><div id="adl-status" class="download-status"></div><div style="text-align:right; margin-top:4px;"><span onclick="deleteAllAudio()" style="font-size:0.7rem; opacity:0.55; text-decoration:underline; cursor:pointer;">Hapus audio offline</span></div></div></div>
                 <div class="setting-group" style="border-bottom:none; margin-top:30px; border-top:1px solid rgba(0,0,0,0.05); padding-top:20px;"><b>Posisi Menu Baca</b><div class="radio-grid"><div class="radio-btn" id="pos-top" onclick="setBarPosition('top')">Atas (Top)</div><div class="radio-btn selected" id="pos-bottom" onclick="setBarPosition('bottom')">Bawah (Bottom)</div></div></div>
                 <button class="option-btn" style="background:var(--accent-color); color:#fff; justify-content:center; margin-top:10px;" onclick="toggleSettings()">Tutup Pengaturan</button>
             </div>
@@ -1783,7 +1783,6 @@
             if(m === 'quran-uthmani') { userConfig.fontFamily = 'UthmanicHafs'; }
             else { userConfig.fontFamily = 'IndoPakNastaleeq'; }
             applyConfig();
-            checkOfflineStatus();
             if(document.getElementById('reading-container').style.display === 'block') { initRead(currentTopPage); }
         }
 
@@ -1835,18 +1834,29 @@
         }
 
         // OFFLINE & DB
-        const DB_NAME = "QuranProDB"; const DB_VER = 3;
+        const DB_NAME = "QuranProDB"; const DB_VER = 4;   // v4: buang salinan halaman "Unduh teks" lama (hemat disk); cache terjemahan dibangun ulang otomatis
         let db;
         const request = indexedDB.open(DB_NAME, DB_VER);
         request.onupgradeneeded = e => {
             db = e.target.result;
+            const vtx = e.target.transaction;
             if(!db.objectStoreNames.contains('pages')) db.createObjectStore('pages', {keyPath: 'id'});
+            else vtx.objectStore('pages').clear();   // v4: bersihkan salinan halaman dari fitur "Unduh teks" (hemat disk)
             if(!db.objectStoreNames.contains('audio')) db.createObjectStore('audio', {keyPath: 'id'});
         };
-        request.onsuccess = e => { db = e.target.result; checkOfflineStatus(); checkOfflineAudioStatus(); };
+        request.onsuccess = e => { db = e.target.result; checkOfflineAudioStatus(); };
 
         // ══ AUDIO OFFLINE — Misyari Rasyid Al-'Afasy ══
-        const AUDIO_CDN = 'https://cdn.islamic.network/quran/audio/64/ar.alafasy/';
+        const AUDIO_CDN = 'https://cdn.islamic.network/quran/audio/64/ar.alafasy/';   // streaming (<audio> tidak kena CORS)
+        const AUDIO_CDN_DL = 'https://everyayah.com/data/Alafasy_64kbps/';            // unduhan offline (CORS OK) — v3.6.1
+        // g = nomor global ayat (1..6236) -> nama file everyayah "SSSAAA.mp3"
+        function everyayahKey(g){
+            if(!_ayahOffsets){ _ayahOffsets = [0]; let t = 0; for(let i = 0; i < 114; i++){ t += SURAH_META[i][2]; _ayahOffsets.push(t); } }
+            let s = 1; while(s <= 114 && g > _ayahOffsets[s]) s++;
+            const a = g - _ayahOffsets[s-1];
+            const p3 = n => (n < 10 ? '00' : n < 100 ? '0' : '') + n;
+            return p3(s) + p3(a);
+        }
         let _ayahOffsets = null;
         function globalAyah(s, a){
             if(!_ayahOffsets){ _ayahOffsets = [0]; let t = 0; for(let i = 0; i < 114; i++){ t += SURAH_META[i][2]; _ayahOffsets.push(t); } }
@@ -1905,7 +1915,7 @@
                 while(queue.length && !audioDlCancel){
                     const g = queue.shift();
                     try{
-                        const res = await fetch(AUDIO_CDN + g + '.mp3');
+                        const res = await fetch(AUDIO_CDN_DL + everyayahKey(g) + '.mp3');
                         if(!res.ok) throw 0;
                         const blob = await res.blob();
                         bytes += blob.size;
@@ -1936,77 +1946,10 @@
             checkOfflineAudioStatus();
         }
 
-        async function checkOfflineStatus() {
-            if(!db) return;
-            const ed = getApiEdition();
-            const tx = db.transaction('pages', 'readonly');
-            const store = tx.objectStore('pages');
-            const req = store.get(`${ed}-1`);
-            req.onsuccess = () => {
-                const badge = document.getElementById('dl-status');
-                if(req.result) badge.innerHTML = `<div class="offline-ready-badge">✓ Offline Ready (${ed === 'quran-indopak' ? 'IndoPak' : 'Utsmani'})</div>`;
-                else badge.innerHTML = '';
-            };
-        }
-        async function saveOfflinePage(id, data){ if(!db) return; const tx=db.transaction('pages','readwrite'); tx.objectStore('pages').put({id:id, data:data}); }
-        async function getOfflinePage(id){ if(!db) return null; return new Promise(r=>{ const tx=db.transaction('pages','readonly'); const req=tx.objectStore('pages').get(id); req.onsuccess=()=>r(req.result?req.result.data:null); req.onerror=()=>r(null); }); }
-
-        async function downloadOfflineData() {
-            if(!confirm("Unduh data Al-Qur'an + Terjemahan?\n\nIni akan mengunduh data untuk mode offline penuh.")) return;
-            const bar = document.getElementById('dl-progress');
-            const fill = document.getElementById('dl-fill');
-            bar.style.display = 'block';
-            const ed = getApiEdition();
-
-            // Download teks Quran per halaman (80%)
-            for (let i = 1; i <= 604; i++) {
-                try {
-                    fill.style.width = ((i / 604) * 80) + "%";
-                    const existing = await getOfflinePage(`${ed}-${i}`);
-                    if (!existing) {
-                        const res = await fetch(`https://api.alquran.cloud/v1/page/${i}/${ed}`);
-                        const json = await res.json();
-                        await saveOfflinePage(`${ed}-${i}`, json.data);
-                    }
-                } catch(e) {}
-            }
-
-            showToast("Teks selesai, mengunduh terjemahan surah populer...");
-
-            // Download terjemahan surah prioritas (20% sisanya)
-            const prioritySurah = [1,2,3,18,36,55,56,67,112,113,114];
-            let tTotal = 0;
-            prioritySurah.forEach(s => tTotal += SURAH_META[s-1][2]);
-            let tDone = 0;
-            for (const s of prioritySurah) {
-                const ayahCount = SURAH_META[s-1][2];
-                for (let a = 1; a <= ayahCount; a++) {
-                    const key = `trans-${s}:${a}`;
-                    try {
-                        const existing = await getOfflineTranslation(key);
-                        if (!existing) {
-                            const r = await fetch(`https://api.alquran.cloud/v1/ayah/${s}:${a}/id.indonesian`);
-                            const d = await r.json();
-                            await saveOfflineTranslation(key, d.data.text);
-                        }
-                    } catch(e) {}
-                    tDone++;
-                    fill.style.width = (80 + (tDone / tTotal) * 20) + "%";
-                }
-            }
-
-            bar.style.display = 'none';
-            alert("✅ Selesai! Al-Qur'an siap digunakan offline.");
-            checkOfflineStatus();
-        }
-
         async function fetchPageData(p){
-            // Cek IndexedDB dulu (data yang sudah didownload user)
+            // Data teks SELALU dari yang tertanam (embedded, sinkron — offline sejak awal).
+            // Fitur "Unduh teks" lama dihapus (v3.6.1); API online hanya cadangan terakhir.
             const ed = getApiEdition();
-            const id = `${ed}-${p}`;
-            const off = await getOfflinePage(id);
-            if(off) return off;
-            // Gunakan data offline yang sudah di-embed
             const pageAyahs = OFFLINE_QURAN[p];
             if(pageAyahs) {
                 // Convert ke format yang sama dengan API response {ayahs: [...]}
@@ -3860,7 +3803,7 @@ var STEPS = [
      body: 'Kumpulan ayat yang kamu tandai. <b>Ketuk bookmark</b> untuk langsung melompat ke ayat itu (presisi ke halaman yang benar). Tombol \u2715 untuk menghapus.'},
     {target: '.hero-actions button[onclick*="toggleSettings"]',
      title: '\u2699\uFE0F Pengaturan',
-     body: 'Semua pengaturan di sini: standar Rasm (IndoPak/Utsmani), perataan teks, garis & tanda mushaf, warna bantuan waqaf, <b>ukuran teks</b> + <b>\uD83D\uDD12 Kunci Ukuran Font</b> (cegah berubah saat scroll), tema (Terang/Mushaf/Gelap), unduh data offline & audio, posisi bar baca.'},
+     body: 'Semua pengaturan di sini: standar Rasm (IndoPak/Utsmani), perataan teks, garis & tanda mushaf, warna bantuan waqaf, <b>ukuran teks</b> + <b>\uD83D\uDD12 Kunci Ukuran Font</b> (cegah berubah saat scroll), tema (Terang/Mushaf/Gelap), unduh audio murattal (offline), posisi bar baca.'},
     {target: '.hero-actions button[onclick*="openTutorial"]',
      title: '\u2753 Bantuan',
      body: 'Tombol <b>?</b> ini membuka kembali tutorial kapan pun kamu butuh. Tutorial juga muncul otomatis saat ada <b>pembaruan versi besar</b> aplikasi.'},

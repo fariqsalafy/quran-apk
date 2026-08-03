@@ -1,5 +1,28 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.6.1 (Agustus 2026)
+
+- **Fitur "Unduh teks" dihapus (redundan).** Teks Al-Qur'an (Utsmani +
+  IndoPak), terjemahan, font, dan Tafsir Jalalain sudah tertanam/terpasang di
+  dalam APK sejak awal — offline penuh tanpa unduhan apa pun. Tombol "Unduh
+  teks" + badge "Offline Ready" di Pengaturan → Mode Offline dihapus; yang
+  tersisa hanya **Unduh Audio Murattal** (satu-satunya yang butuh unduhan).
+- **Perbaikan lag saat ganti halaman.** Penyebabnya: setelah user menekan
+  "Unduh teks", app membaca Tiap halaman dari IndexedDB (async, lambat) DULU
+  sebelum data bawaan. Kini `fetchPageData` langsung memakai data tertanam
+  (sinkron — instan); API online hanya cadangan terakhir. Ganti halaman
+  kembali mulus.
+- **Perbaikan Unduh Audio gagal terus (bug CORS).** Sumber lama
+  `cdn.islamic.network` tidak mengirim header Access-Control-Allow-Origin,
+  sehingga fetch dari WebView selalu diblokir (unduhan 6236 file selalu gagal;
+  streaming tetap jalan karena `<audio>` tidak kena CORS). Sumber unduhan
+  diganti ke `everyayah.com` (Alafasy 64kbps — qari sama, bitrate sama, CORS
+  diizinkan; ukuran total tetap ±500 MB). Helper `everyayahKey(g)` memetakan
+  nomor global ayat → nama file `SSSAAA.mp3`. Streaming tidak berubah.
+- **Pembersihan database (DB v4).** Saat upgrade, salinan 604 halaman lama di
+  IndexedDB dihapus (hemat disk; cache terjemahan dibangun ulang otomatis dari
+  data tertanam). Data audio offline TIDAK terhapus.
+
 ## v3.6.0 (Agustus 2026)
 
 - **Perubahan perilaku: kartu "Lanjutkan Bacaan" tidak lagi muncul otomatis.**
