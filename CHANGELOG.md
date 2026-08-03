@@ -1,5 +1,20 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.6.0 (Agustus 2026)
+
+- **Perubahan perilaku: kartu "Lanjutkan Bacaan" tidak lagi muncul otomatis.**
+  Sebelumnya posisi baca terakhir tersimpan otomatis saat scroll (ayat teratas
+  berganti) dan saat ayat diketuk — sehingga kartu 📖 di beranda hampir selalu
+  muncul sendiri. Kini kartu **hanya muncul jika user sengaja menjadikan sebuah
+  ayat sebagai terakhir baca**, lewat menu long-press ayat: opsi baru
+  **"📌 Jadikan Terakhir Baca"** (tombol full-width beraksen emas di bawah
+  opsi Terjemah & Tafsir / Bookmark / Salin / Audio). Mengetuknya langsung
+  menyimpan surah + ayat + halaman, menutup modal, dan menampilkan toast —
+  kartu beranda pun terisi & muncul. Tetap satu posisi: set ulang ke ayat lain
+  akan menimpa yang lama. Fungsi lanjut membaca (ketuk kartu → buka tepat di
+  ayat itu) tidak berubah. Auto-save saat scroll & tap ayat dihapus
+  (variabel `_hdrLast` dibuang). Teks tutorial onboarding ikut disesuaikan.
+
 ## v3.5.1 (Agustus 2026)
 
 - **Perbaikan: modal "Tafsir/Terjemah" kini benar-benar menampilkan

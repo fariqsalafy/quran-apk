@@ -2094,7 +2094,7 @@
         }
 
         // ══ INFO BACAAN AKTIF: surah + halaman + AYAT teratas di layar ══
-        let _hdrPage = null, _hdrLast = '';
+        let _hdrPage = null;
         function updateHeaderInfo(){
             const rc = document.getElementById('reading-container');
             if(!rc || rc.style.display !== 'block') return;
@@ -2116,8 +2116,6 @@
             const hd = document.getElementById('header-details');
             if(hs) hs.innerText = 'QS. ' + sName;
             if(hd) hd.innerText = 'Hal. ' + (pg || '-') + ' \u00b7 Ayat ' + a;
-            const key = s + ':' + a + ':' + pg;
-            if(key !== _hdrLast){ _hdrLast = key; saveLastRead(s, a, pg || 1, sName); }
         }
         let _hdrTick = null;
         window.addEventListener('scroll', () => {
@@ -2493,7 +2491,6 @@
 
         function onClickAyah(s, a, n, p) {
             if(isLongPress) return;
-            saveLastRead(s,a,p,n);
             const domId = `ayah-${s}-${a}`;
             const el = document.getElementById(domId);
 
@@ -2559,6 +2556,7 @@
                     <button class="option-btn" style="justify-content:center;" onclick="triggerCopyMenu()">📋 Salin Ayat</button>
                     <button class="option-btn" style="justify-content:center;" onclick="triggerAudio()">🔊 Putar Audio</button>
                 </div>
+                <button class="option-btn" style="justify-content:center; margin:12px 0 0; border:1.5px solid var(--gold-border); background:linear-gradient(135deg, rgba(154,110,26,0.16), rgba(154,110,26,0.06)); color:var(--gold); font-weight:700;" onclick="triggerLastRead()">📌 Jadikan Terakhir Baca</button>
             `;
             m.classList.add('open');
         }
@@ -2569,6 +2567,14 @@
             saveBookmarks(); closeModal('ayah-modal');
             const el = document.getElementById(`ayah-${selectedAyah.s}-${selectedAyah.a}`); if(el) el.classList.toggle('bookmarked');
             showToast();
+        }
+
+        // Jadikan ayat ini sebagai "terakhir baca" (manual — kartu beranda hanya muncul utk yg di-set sengaja)
+        function triggerLastRead(){
+            const sNameId = (SURAH_META[selectedAyah.s-1] || [])[0] || selectedAyah.n || ('Surah ' + selectedAyah.s);
+            saveLastRead(selectedAyah.s, selectedAyah.a, selectedAyah.p || 1, sNameId);
+            closeModal('ayah-modal');
+            showToast('📌 Terakhir baca: ' + sNameId + ' · Ayat ' + selectedAyah.a);
         }
 
         async function triggerTafsir(){
@@ -3833,7 +3839,7 @@ var STEPS = [
      body: 'Jadwal shalat hari ini sesuai <b>metode Kemenag RI</b>. Waktu berikutnya tampil besar + hitung mundur, 4 waktu lain di bawahnya. <b>Ketuk kartu ini</b> untuk pilih lokasi (GPS otomatis / pilih kota) dan aktifkan <b>notifikasi adzan</b>. Jadwal tersimpan offline 1 tahun — identik dengan online.'},
     {target: '#last-read-banner',
      title: '\uD83D\uDCD6 Lanjutkan Membaca',
-     body: 'Kartu ini mengingat posisi baca terakhirmu (surah, halaman, ayat). <b>Ketuk untuk lanjut</b> tepat dari tempat terakhir — bookmark pun presisi per-ayat.'},
+     body: 'Kartu ini <b>hanya muncul</b> setelah kamu sengaja menjadikan sebuah ayat sebagai terakhir baca — lewat menu long-press ayat (tombol \uD83D\uDCCC <b>Jadikan Terakhir Baca</b>). <b>Ketuk untuk lanjut</b> tepat dari ayat itu.'},
     {target: '#tilawah-card',
      title: '\uD83D\uDCC8 Progres Tilawah',
      body: 'Pantau progres khataman: berapa halaman dari 604 yang sudah kamu baca. Tombol \u21BA untuk mulai dari awal.'},
@@ -3848,7 +3854,7 @@ var STEPS = [
      body: '<b>Demo:</b> kami bukakan contoh bacaan (QS. Al-Kahf 18:60). Perhatikan <b>bar atas</b> yang menampilkan info <b>surah \u00b7 halaman \u00b7 ayat</b>. Tombolnya: \uD83C\uDF10 terjemahan, \uD83D\uDD0D <b>Navigasi Ayat</b>, \u2B07 auto-scroll. Ketuk <b>\u2190</b> untuk kembali ke menu.'},
     {target: null, demo: 'sample',
      title: '\uD83D\uDC49 Saat Membaca (2/2)',
-     body: '<b>Ketuk ayat mana pun</b> untuk membuka menu: \uD83D\uDCD6 Terjemah &amp; Tafsir, \uD83D\uDCCD Bookmark ayat, \uD83D\uDCCB Salin ayat, \uD83D\uDD0A Putar audio murattal (Misyari Rasyid). Ketuk ayat lagi untuk menghapus highlight. <b>Lanjutkan</b> untuk kembali ke menu.'},
+     body: '<b>Ketuk ayat mana pun</b> untuk membuka menu: \uD83D\uDCD6 Terjemah &amp; Tafsir, \uD83D\uDCCD Bookmark ayat, \uD83D\uDCCB Salin ayat, \uD83D\uDD0A Putar audio murattal (Misyari Rasyid), dan \uD83D\uDCCC <b>Jadikan Terakhir Baca</b> untuk memunculkan kartu Lanjutkan Membaca di beranda. Ketuk ayat lagi untuk menghapus highlight. <b>Lanjutkan</b> untuk kembali ke menu.'},
     {target: '.hero-actions button[onclick*="openBookmarkList"]',
      title: '\uD83D\uDCCD Bookmark',
      body: 'Kumpulan ayat yang kamu tandai. <b>Ketuk bookmark</b> untuk langsung melompat ke ayat itu (presisi ke halaman yang benar). Tombol \u2715 untuk menghapus.'},
