@@ -757,10 +757,10 @@
         }
         .bismillah-text {
             font-family: var(--arabic-font), 'Scheherazade New', serif;
-            font-size: 1.65rem; color: var(--gold);
-            line-height: 1.9;
-            display: inline-block; white-space: nowrap; direction: rtl;
-            /* ukuran akhir di-fit oleh JS agar lebarnya maksimal */
+            font-size: 2.1rem; color: var(--gold);
+            line-height: 1.7;
+            display: block; white-space: nowrap; width: 100%; text-align: center; direction: rtl;
+            /* ukuran akhir di-fit oleh JS ALWAYS (fitBismillah) — 1 baris, fit lebar kolom */
         }
 
         /* ── QURAN TEXT ── */
@@ -899,7 +899,7 @@
             border-bottom: 1px solid var(--border); flex-shrink: 0;
         }
         .settings-preview-area {
-            background: var(--bg-card); padding: 10px 20px 18px;
+            background: var(--bg-card); padding: 8px 16px 14px;
             border-bottom: 1px solid var(--border); flex-shrink: 0;
         }
         .settings-content-scroll { flex: 1; overflow-y: auto; padding: 18px 22px 40px; }
@@ -997,19 +997,28 @@
         input[type=range] { width: 100%; accent-color: var(--gold); margin-top: 10px; }
 
         .font-preview {
-            width: 100%; min-height: 90px; height: auto;
-            max-height: 150px; overflow-y: auto;   /* pengaman: preview tak pernah menutupi modal */
+            width: 100%; height: 180px; min-height: 180px;
+            max-height: 360px; overflow-y: auto;   /* compact: default 180px; user bisa digeser 180-360 (2x) */
             box-sizing: border-box;
-            padding: 16px 14px 20px;
-            display: block; position: relative; overflow-x: visible;
+            padding: 12px 12px 22px;
+            display: block; position: relative; overflow-x: hidden;
             background: var(--bg-elevated);
             border-radius: 12px; text-align: var(--text-align, center); direction: rtl;
             font-family: var(--arabic-font); line-height: 2.3;
             font-weight: var(--font-weight-adjust);
             border: 1px solid var(--border); font-size: var(--arabic-font-size);
-            overflow: hidden;
-            display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
+        }
+        .preview-resize-hint {
+            position: absolute; right: 4px; bottom: 2px; font-size: 0.62rem; color: var(--text-sub); opacity: 0.55; user-select: none;
+        }
+        .preview-resize-handle {
+            position: absolute; right: 0; bottom: 0; width: 26px; height: 26px;
+            cursor: row-resize; touch-action: manipulation; user-select: none;
+            border-top: 1px solid var(--border); border-left: 1px solid var(--border);
+            background: linear-gradient(135deg, rgba(0,0,0,0) 40%, var(--accent-color, #1e7070) 45% 60%, rgba(0,0,0,0) 65%), linear-gradient(135deg, rgba(0,0,0,0) 40%, var(--accent-color, #1e7070) 45% 60%, rgba(0,0,0,0) 65%);
+            background-size: 14px 14px, 22px 22px; background-position: 8px 8px, 12px 12px; background-repeat: no-repeat;
+            opacity: 0.65; border-radius: 4px;
         }
         .download-box {
             background: var(--bg-card); padding: 14px; border-radius: 12px;
@@ -1045,6 +1054,9 @@
             border-radius: 12px; border: 1px solid var(--border);
         }
         .bm-info { flex: 1; cursor: pointer; }
+        .bm-title { font-weight: 700; font-size: 0.9rem; color: var(--text, #1a1208); }
+        .bm-sub { font-size: 0.72rem; opacity: 0.65; margin-top: 2px; }
+        .bm-edit { border: none; background: none; font-size: 1.05rem; color: var(--accent-color, #1e7070); padding: 8px; cursor: pointer; }
         .bm-del { border: none; background: none; font-size: 1.1rem; color: #e74c3c; padding: 8px; cursor: pointer; }
 
         /* ── AUDIO CONTROL BAR ── */
@@ -1377,7 +1389,7 @@
     <div id="settings-modal" class="modal-overlay" onclick="closeModal('settings-modal')">
         <div class="modal-panel" onclick="event.stopPropagation()">
             <div class="settings-header"><h2 style="color:var(--accent-color); margin:0;">Pengaturan</h2></div>
-            <div class="settings-preview-area"><div style="font-size:0.8rem; margin-bottom:5px; opacity:0.7;">Preview (QS. Al-Fatihah: 2):</div><div id="preview-box" class="font-preview"></div></div>
+            <div class="settings-preview-area"><div style="font-size:0.8rem; margin-bottom:5px; opacity:0.7;"><span style="opacity:0.55;" id="preview-scale"></span><span style="opacity:0.5;"> · digeser ↕ utk lebih tinggi/lebar</span></div><div id="preview-box" class="font-preview"><div class="preview-resize-hint">↕</div><div class="preview-resize-handle" id="preview-resize-handle" title="Digeser utk ganti ukuran preview"></div></div></div>
             <div class="settings-content-scroll">
                 <div class="setting-group"><b>Standar Rasm</b><div class="radio-grid"><div class="radio-btn" id="opt-quran-indopak" onclick="setMode('quran-indopak')"><span style="font-weight:700;font-family:'IndoPakNastaleeq';font-size:1.3rem;">انڈوپاک</span><span style="font-size:0.8rem;">IndoPak</span></div><div class="radio-btn" id="opt-quran-uthmani" onclick="setMode('quran-uthmani')"><span style="font-weight:700;font-family:'UthmanicHafs','Scheherazade New';font-size:1.4rem;">عثماني</span><span style="font-size:0.8rem;">Utsmani</span></div></div></div>
                 <div class="setting-group"><b>Perataan Teks</b><div class="radio-grid"><div class="radio-btn selected" id="opt-align-center" onclick="setTextAlign('center')"><span style="font-size:1.05rem; letter-spacing:2px;">&#9473;&#9473;</span><span style="font-size:0.8rem;">Tengah</span></div><div class="radio-btn" id="opt-align-right" onclick="setTextAlign('right')"><span style="font-size:1.05rem; letter-spacing:2px;">&#9473;&#9473;&#9595;</span><span style="font-size:0.8rem;">Kanan</span></div><div class="radio-btn" id="opt-align-justify" onclick="setTextAlign('justify')"><span style="font-size:1.05rem; letter-spacing:2px;">&#9473;&#9473;&#9473;</span><span style="font-size:0.8rem;">Rata Penuh</span></div><div class="radio-btn" id="opt-align-left" onclick="setTextAlign('left')"><span style="font-size:1.05rem; letter-spacing:2px;">&#9595;&#9473;&#9473;</span><span style="font-size:0.8rem;">Kiri</span></div></div></div>
@@ -1402,6 +1414,7 @@
                     </div>
                     </div>
                 <div class="setting-group"><b>Mode Offline</b><div class="download-box"><div style="font-size:0.75rem; opacity:0.7; margin-bottom:12px;">Teks Al-Qur'an &amp; terjemahan sudah offline otomatis (tertanam di app) — yang perlu diunduh hanya <b>audio</b>.</div><div style="border-top:1px dashed var(--border); margin:0 0 10px;"></div><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-size:0.9rem; font-weight:600;">Audio Murattal</span><button id="adl-btn" class="option-btn" style="width:auto; padding:8px 15px; margin:0; background:var(--accent-color); color:white;" onclick="downloadAllAudio()">Unduh</button></div><div style="font-size:0.75rem; opacity:0.7; margin-top:5px;">Qari Misyari Rasyid Al-'Afasy — 1 Al-Qur'an penuh (± 500 MB). Bisa dijeda &amp; otomatis lanjut.</div><div id="adl-progress" class="progress-bar"><div id="adl-fill" class="progress-fill"></div></div><div id="adl-status" class="download-status"></div><div style="text-align:right; margin-top:4px;"><span onclick="deleteAllAudio()" style="font-size:0.7rem; opacity:0.55; text-decoration:underline; cursor:pointer;">Hapus audio offline</span></div></div></div>
+                <div class="setting-group"><b>Kartu Beranda</b><div style="font-size:0.72rem; opacity:0.7; margin:4px 0 10px;">Pilih kartu mana yang tampil di beranda.</div><div style="display:flex; justify-content:space-between; align-items:center;"><div><b>🕌 Jadwal Shalat</b></div><label class="switch"><input type="checkbox" id="show-prayer-check" onchange="setShowPrayerCard(this.checked)"><span class="slider"></span></label></div><div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;"><div><b>📖 Terakhir Baca</b><div style="font-size:0.72rem; opacity:0.7;">Hanya tampil jika ada terakhir baca set.</div></div><label class="switch"><input type="checkbox" id="show-lastread-check" onchange="setShowLastReadCard(this.checked)"><span class="slider"></span></label></div><div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;"><div><b>📈 Progres Tilawah</b></div><label class="switch"><input type="checkbox" id="show-tilawah-check" onchange="setShowTilawahCard(this.checked)"><span class="slider"></span></label></div></div>
                 <div class="setting-group" style="border-bottom:none; margin-top:30px; border-top:1px solid rgba(0,0,0,0.05); padding-top:20px;"><b>Posisi Menu Baca</b><div class="radio-grid"><div class="radio-btn" id="pos-top" onclick="setBarPosition('top')">Atas (Top)</div><div class="radio-btn selected" id="pos-bottom" onclick="setBarPosition('bottom')">Bawah (Bottom)</div></div></div>
                 <button class="option-btn" style="background:var(--accent-color); color:#fff; justify-content:center; margin-top:10px;" onclick="toggleSettings()">Tutup Pengaturan</button>
             </div>
@@ -1445,7 +1458,8 @@
         </div>
     </div>
 
-    <div id="bookmarks-modal" class="modal-overlay" onclick="closeModal('bookmarks-modal')"><div class="modal-panel" style="overflow-y:auto; display:block;" onclick="event.stopPropagation()"><div style="padding:25px;"><div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h3 style="color:var(--accent-color);">Bookmark</h3><button class="btn-icon" onclick="closeModal('bookmarks-modal')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div><div id="bookmark-list-content"></div></div></div></div>
+    <div id="bookmarks-modal" class="modal-overlay" onclick="closeModal('bookmarks-modal')"><div class="modal-panel" style="overflow-y:auto; display:block;" onclick="event.stopPropagation()"><div style="padding:25px;"><div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h3 style="color:var(--accent-color);">Bookmark</h3><button class="btn-icon" onclick="closeModal('bookmarks-modal')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div><input type="text" id="bm-search" placeholder="🔍 Cari bookmark (nama / surah / ayat)..." oninput="renderBookmarkList()" style="width:100%; margin-bottom:14px; padding:9px 12px; border:1.5px solid var(--border); border-radius:10px; background:var(--bg-elevated); color:var(--text); font-size:0.85rem; outline:none;"><div id="bookmark-list-content"></div></div></div></div>
+    <div id="bm-name-modal" class="modal-overlay" style="z-index:5200;" onclick="closeModal('bm-name-modal')"><div class="modal-panel" onclick="event.stopPropagation()"><div style="padding:22px 20px 18px;"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><h3 style="color:var(--accent-color); margin:0;">🖊️ Nama Bookmark</h3><button class="btn-icon" onclick="closeModal('bm-name-modal')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div><div style="font-size:0.8rem; opacity:0.75; margin-bottom:10px;">Tulis judul/nama custom utk bookmark ini — berguna utk pencarian di daftar Bookmark. Kosong = pakai nama surah.</div><input type="text" id="bm-name-input" maxlength="60" placeholder="Nama bookmark..." onkeydown="if(event.key==='Enter') saveBookmarkName()" style="width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:10px; background:var(--bg-elevated); color:var(--text); font-size:0.9rem; outline:none; margin-bottom:12px;"><div style="display:flex; justify-content:flex-end; gap:10px;"><button class="option-btn" style="background:rgba(0,0,0,0.06);" onclick="closeModal('bm-name-modal')">Batal</button><button class="option-btn" style="background:var(--accent-color); color:#fff;" onclick="saveBookmarkName()">💾 Simpan</button></div></div></div></div>
     <div id="ayah-modal" class="modal-overlay" onclick="closeModal('ayah-modal')"><div class="modal-panel" style="overflow-y:auto; display:block;" onclick="event.stopPropagation()"><div id="ayah-modal-content" style="padding:25px;"></div></div></div>
     <div id="tafsir-modal" class="modal-overlay" onclick="closeModal('tafsir-modal')"><div class="modal-panel" style="height:85vh; overflow-y:auto; display:block;" onclick="event.stopPropagation()"><div style="padding:25px;"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;"><button class="btn-icon" onclick="tafsirNav(-1)" title="Ayat sebelumnya" style="font-size:1.1rem;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button><h3 style="color:var(--accent-color); margin:0;">Terjemah &amp; Tafsir</h3><div style="display:flex; gap:10px;"><button class="btn-icon" onclick="tafsirNav(1)" title="Ayat berikutnya" style="font-size:1.1rem;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button><button class="option-btn" style="padding:5px 15px; margin:0; width:auto; font-size:0.9rem;" onclick="copyTafsirContent()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Salin</button><button class="btn-icon" onclick="closeModal('tafsir-modal')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div></div><div id="tafsir-meta" style="font-size:0.85rem; color:var(--text-color); opacity:0.7; margin-bottom:15px; font-weight:600; border-bottom:1px solid rgba(0,0,0,0.1); padding-bottom:10px;"></div><div id="tafsir-loader" style="text-align:center;">Memuat...</div><div id="tafsir-content-box" style="display:none; font-size:0.95rem; line-height:1.6; text-align:justify;"><div id="tafsir-body"></div></div></div></div></div>
     <div id="info-modal" class="modal-overlay" onclick="closeModal('info-modal')"><div class="modal-panel" style="overflow-y:auto; display:block;" onclick="event.stopPropagation()"><div style="padding:25px;"><h2 style="margin-bottom:15px; color:var(--accent-color);">Tentang Aplikasi</h2><div style="line-height:1.6; font-size:0.9rem; color:var(--text-color);"><p style="margin-bottom:12px;">Aplikasi Al-Qur'an digital — Rasm Utsmani Madinah &amp; IndoPak, terjemahan Indonesia, audio murattal, 100% dapat offline.</p><div style="padding:12px 14px; background:rgba(0,0,0,0.03); border:1px solid rgba(0,0,0,0.05); border-radius:10px; margin-bottom:12px; font-size:0.78rem; line-height:1.7;"><b style="color:var(--accent-color);">Sumber Data Al-Qur'an &amp; Atribusi</b><br>• Data 6.236 ayat / 604 halaman mushaf<br>• Teks Rasm Utsmani: Tanzil.net (quran-uthmani)<br>• Teks IndoPak (Mushaf Majeed): Quranic Universal Library / QuranWBW<br>• Font: KFGQPC Uthmanic Hafs (Mujamma' Raja Fahd, Madinah) &amp; IndoPak Nastaleeq (QuranWBW)<br>• Terjemahan Bahasa Indonesia: AlQuran Cloud<br>• Tafsir Jalalain: renomureza/quran-api-id (MIT) — sumber Tafsir Al-Jalalain<br>• Audio: Misyari Rasyid Al-'Afasy — Islamic Network CDN</div><div style="text-align:center; padding:15px; background:rgba(0,0,0,0.03); border-radius:10px; border:1px solid rgba(0,0,0,0.05);"><div style="font-size:0.8rem; opacity:0.6;">Dibuat oleh:</div><div style="font-weight:700; color:var(--accent-color); font-size:1.1rem; margin-bottom:10px;">M Fariq Salafy</div></div></div><button class="option-btn" style="margin-top:20px; justify-content:center;" onclick="closeModal('info-modal')">Tutup</button></div></div></div>
@@ -1619,7 +1633,10 @@
             bgColor: '#f2e8c8',
             textColor: '#2a1800',
             showWaqaf: true,
-            barPosition: 'bottom'
+            barPosition: 'bottom',
+            showPrayerCard: false,
+            showLastReadCard: true,
+            showTilawahCard: false
         };
 
         const availableFonts = {
@@ -1632,6 +1649,8 @@
             initLists();
             initLastRead();
             initTilawahProgress();
+            restorePreviewH();
+            initPreviewResize();
             document.getElementById('global-loader').classList.add('hidden');
         });
 
@@ -1745,6 +1764,11 @@
             const fd=document.getElementById('font-disp');if(fd)fd.innerText=userConfig.fontSize+'px';
             const pb=document.getElementById('preview-box');if(pb)pb.style.fontSize=userConfig.fontSize+'px';
 
+            const pcSw=document.getElementById('show-prayer-check');if(pcSw)pcSw.checked=userConfig.showPrayerCard!==false;
+            const lrcSw=document.getElementById('show-lastread-check');if(lrcSw)lrcSw.checked=userConfig.showLastReadCard!==false;
+            const tcSw=document.getElementById('show-tilawah-check');if(tcSw)tcSw.checked=userConfig.showTilawahCard!==false;
+            applyHomeCards();
+
             updatePreviewText();
             updateBarPositionClass();
             updateWaqafClasses();
@@ -1771,10 +1795,8 @@
             userConfig.fontSize = v;
             document.getElementById('font-disp').innerText = v + 'px';
             document.documentElement.style.setProperty('--arabic-font-size', v + 'px');
-            // Preview ikut slider penuh (20-120px). Modal tetap aman karena
-            // .font-preview punya max-height:150px + overflow-y:auto (pengaman CSS).
             const pb = document.getElementById('preview-box');
-            if (pb) pb.style.fontSize = v + 'px';
+            if (pb){ pb.style.fontSize = v + 'px'; requestAnimationFrame(fitPreviewText); }
         }
 
         function setMode(m){
@@ -1810,6 +1832,18 @@
         function updateWaqafClasses(){ const el = document.getElementById('content-area'); if(el) { if(userConfig.showWaqaf) el.classList.add('show-waqaf'); else el.classList.remove('show-waqaf'); } }
         function _baseApplyTheme(bg, tx) { userConfig.bgColor=bg; userConfig.textColor=tx; applyConfig(); }
         function setBarPosition(p){ userConfig.barPosition=p; applyConfig(); }
+        // ══ KARTU BERANDA: show/hide (Jadwal, Terakhir Baca, Progres Tilawah) ══
+        function applyHomeCards(){
+            const pc = document.getElementById('prayer-card');
+            if(pc) pc.style.display = userConfig.showPrayerCard !== false ? '' : 'none';
+            const lr = document.getElementById('last-read-banner');
+            if(lr) lr.style.display = userConfig.showLastReadCard !== false ? '' : 'none';
+            const tc = document.getElementById('tilawah-card');
+            if(tc) tc.style.display = userConfig.showTilawahCard !== false ? '' : 'none';
+        }
+        function setShowPrayerCard(v){ userConfig.showPrayerCard = !!v; applyHomeCards(); saveData(); }
+        function setShowLastReadCard(v){ userConfig.showLastReadCard = !!v; applyHomeCards(); saveData(); }
+        function setShowTilawahCard(v){ userConfig.showTilawahCard = !!v; applyHomeCards(); saveData(); }
         function getHeaderColor(hex){
              let r=parseInt(hex.substr(1,2),16),g=parseInt(hex.substr(3,2),16),b=parseInt(hex.substr(5,2),16);
              return `rgba(${r},${g},${b},0.95)`;
@@ -1830,7 +1864,64 @@
             p.style.lineHeight = '2.3';
             p.classList.toggle('show-waqaf', userConfig.showWaqaf !== false);
             p.innerHTML = '<span class="dynamic-font" style="display:block; width:100%; text-align: var(--text-align, center);">' + processText(t) + '</span>';
-            requestAnimationFrame(() => calibrateRuleBlock(p));   // garis mushaf ikut tampil di preview
+            requestAnimationFrame(() => { fitPreviewText(); calibrateRuleBlock(p); });   // ukuran real dulu; garis mushaf ikut ukuran efektif
+        }
+
+        // ══ PREVIEW: fit-text auto-scale + resize grabber ══
+        // ══ PREVIEW: ukuran real selalu + tinggi compacto (resize manual 180-360) + scroll bila lewat ══
+        // Tidak ada fit-shrink: preview tampil ukuran asli (ikut slider).
+        // Teks ukuran real (ikut slider), box tinggi compacto; lewat → scroll overflow.
+        function fitPreviewText(){
+            const p = document.getElementById('preview-box');
+            if(!p) return;
+            const content = p.querySelector('.dynamic-font');
+            if(!content) return;
+            const baseFs = parseFloat(p.style.fontSize) || 70;
+            // SEMUA ukuran real — tidak ada fit-shrink. Slider = ukuran tampil.
+            content.style.fontSize = '';
+            const needH = Math.ceil(content.getBoundingClientRect().height);
+            // Label transparan: ukuran real selalu + indikasi scroll bila lewat box
+            const scaleEl = document.getElementById('preview-scale');
+            if(scaleEl){
+                const overflows = needH > (p.clientHeight - 10);
+                const hint = overflows ? ' · ↓ scroll utk lihat semua' : '';
+                scaleEl.innerText = '· 100% · teks ' + Math.round(baseFs) + 'px' + hint;
+            }
+        }
+        const PREVIEW_MAX_H = 360;   // 2x default tinggi (180px) — cap preview & resize clamp ikut ini
+        const PREVIEW_H_KEY = 'quranProPreviewH';
+        let previewResizing = false;   // reserved (drag manual)
+        function restorePreviewH(){
+            const box = document.getElementById('preview-box');
+            if(!box) return;
+            try{ const h = parseInt(localStorage.getItem(PREVIEW_H_KEY)||'',10); if(h && h >= 180 && h <= PREVIEW_MAX_H){ box.style.height = h+'px'; box.style.minHeight = h+'px'; } }catch(e){}
+        }
+        function initPreviewResize(){
+            const box = document.getElementById('preview-box');
+            const handle = document.getElementById('preview-resize-handle');
+            if(!box || !handle) return;
+            handle.addEventListener('pointerdown', function(ev){
+                ev.preventDefault(); ev.stopPropagation();
+                previewResizing = true;
+                const py = (ev.pointerY !== undefined) ? ev.pointerY : ev.clientY;
+                const ph = box.getBoundingClientRect().height;
+                function onMove(e){
+                    const cy = (e.pointerY !== undefined) ? e.pointerY : e.clientY;
+                    const h = Math.min(PREVIEW_MAX_H, Math.max(180, ph + (cy - py)));
+                    box.style.height = h+'px'; box.style.minHeight = h+'px';
+                }
+                function onUp(){
+                    document.removeEventListener('pointermove', onMove);
+                    document.removeEventListener('pointerup', onUp);
+                    document.removeEventListener('pointercancel', onUp);
+                    previewResizing = false;
+                    try{ localStorage.setItem(PREVIEW_H_KEY, String(Math.round(box.getBoundingClientRect().height))); }catch(e){}
+                    requestAnimationFrame(fitPreviewText);
+                }
+                document.addEventListener('pointermove', onMove);
+                document.addEventListener('pointerup', onUp);
+                document.addEventListener('pointercancel', onUp);
+            }, {passive:false});
         }
 
         // OFFLINE & DB
@@ -2363,7 +2454,9 @@
 
         let bookmarks = new Set();
         try { const b = localStorage.getItem('quranProBookmarks'); if(b) bookmarks = new Set(JSON.parse(b)); } catch(e){}
-        function saveBookmarks(){ localStorage.setItem('quranProBookmarks', JSON.stringify([...bookmarks])); }
+        let bmTitles = {};
+        try { const t = localStorage.getItem('quranProBookmarkTitles'); if(t) bmTitles = JSON.parse(t); } catch(e){}
+        function saveBookmarks(){ localStorage.setItem('quranProBookmarks', JSON.stringify([...bookmarks])); localStorage.setItem('quranProBookmarkTitles', JSON.stringify(bmTitles)); }
 
         // ══ PROGRES TILAWAH (lokal) ══
         let pagesRead = new Set();
@@ -2476,13 +2569,73 @@
             }
         }
 
-        function openBookmarkList(){const c=document.getElementById('bookmark-list-content');c.innerHTML='';if(bookmarks.size===0)c.innerHTML='<div style="text-align:center;padding:20px;color:#999;">Kosong</div>';else bookmarks.forEach(k=>{const[s,a]=k.split(':');const n=(SURAH_META[parseInt(s)-1][0] || 'Surah '+s);c.innerHTML+=`<div class="bm-item"><div class="bm-info" onclick="goToBookmark(${s},${a})"><div class="bm-title">QS. ${n}</div><div class="bm-sub">Ayat ${a}</div></div><button class="bm-del" onclick="deleteBookmark('${k}')">✕</button></div>`;});document.getElementById('bookmarks-modal').classList.add('open');}
+        function openBookmarkList(){
+            const si = document.getElementById('bm-search'); if(si) si.value='';
+            renderBookmarkList();
+            document.getElementById('bookmarks-modal').classList.add('open');
+        }
+        function bmMeta(k){
+            const p = k.split(':');
+            const s = parseInt(p[0]);
+            const n = (SURAH_META[s-1] || [])[0] || ('Surah ' + s);
+            return {s: s, a: parseInt(p[1]), n: n};
+        }
+        function renderBookmarkList(){
+            const c = document.getElementById('bookmark-list-content'); c.innerHTML='';
+            if(bookmarks.size===0){ c.innerHTML='<div style="text-align:center;padding:20px;color:#999;">Kosong — ketuk ayat saat baca → 🔖 Bookmark</div>'; return; }
+            const box = document.getElementById('bm-search');
+            const q = (box ? box.value : '').trim().toLowerCase();
+            let shown = 0;
+            bookmarks.forEach(k=>{
+                const m = bmMeta(k);
+                const title = (bmTitles[k]||'').trim();
+                const label = title ? title : ('QS. ' + m.n + ' · Ayat ' + m.a);
+                const sub = 'QS. ' + m.n + ' · Ayat ' + m.a;
+                if(q && (label + ' ' + sub + ' ' + m.s + ' ' + m.a).toLowerCase().indexOf(q) === -1) return;
+                shown++;
+                c.innerHTML += '<div class="bm-item"><div class="bm-info" onclick="goToBookmark(' + m.s + ',' + m.a + ')"><div class="bm-title">' + escHtml(label) + '</div><div class="bm-sub">' + sub + '</div></div><button class="bm-edit" onclick="renameBookmark(\'' + k + '\')" title="Narank">✎</button><button class="bm-del" onclick="deleteBookmark(\'' + k + '\')" title="Hapus">✕</button></div>';
+            });
+            if(shown===0) c.innerHTML = '<div style="text-align:center;padding:20px;color:#999;">Tidak ada hasil untuk "' + escHtml(q) + '"</div>';
+        }
         function goToBookmark(s,a){
             closeModal('bookmarks-modal');
             const p = pageOfAyah(s, a);   // halaman tempat ayat berada (bukan awal surah)
             initRead(p).then(() => setTimeout(() => scrollToAyah(s, a, {center: true, highlight: true}), 250));
         }
-        function deleteBookmark(k){ bookmarks.delete(k); saveBookmarks(); openBookmarkList(); }
+        function deleteBookmark(k){ bookmarks.delete(k); delete bmTitles[k]; saveBookmarks(); renderBookmarkList(); }
+        // ── Nama custom utk bookmark (tambah / rename) ──
+        let bmNameMode = 'add', bmNameKey = '';
+        function openBookmarkNameModal(mode, key, defaultName){
+            bmNameMode = mode; bmNameKey = key;
+            const inp = document.getElementById('bm-name-input');
+            inp.value = defaultName || '';
+            document.getElementById('bm-name-modal').classList.add('open');
+            setTimeout(function(){ try{ inp.focus(); inp.select(); }catch(e){} }, 120);
+        }
+        function renameBookmark(k){
+            const t = (bmTitles[k]||'').trim();
+            openBookmarkNameModal('rename', k, t ? t : ('QS. ' + bmMeta(k).n + ' · Ayat ' + bmMeta(k).a));
+        }
+        function saveBookmarkName(){
+            const inp = document.getElementById('bm-name-input');
+            const val = (inp.value || '').trim().slice(0,60);
+            if(bmNameMode === 'add'){
+                const key = bmNameKey;
+                bookmarks.add(key);
+                if(val) bmTitles[key] = val; else delete bmTitles[key];
+                saveBookmarks();
+                closeModal('bm-name-modal'); closeModal('ayah-modal');
+                const kk = key.split(':');
+                const el = document.getElementById('ayah-' + kk[0] + '-' + kk[1]); if(el) el.classList.add('bookmarked');
+                showToast('🔖 Bookmark tersimpan' + (val ? ': ' + val : ''));
+            } else {
+                if(val) bmTitles[bmNameKey] = val; else delete bmTitles[bmNameKey];
+                saveBookmarks();
+                closeModal('bm-name-modal');
+                renderBookmarkList();
+                showToast('✎ Bookmark narank');
+            }
+        }
 
         function showAyahModal() {
             const m = document.getElementById('ayah-modal');
@@ -2506,10 +2659,15 @@
 
         function triggerBookmark(){
             const key = `${selectedAyah.s}:${selectedAyah.a}`;
-            if(bookmarks.has(key)) bookmarks.delete(key); else bookmarks.add(key);
-            saveBookmarks(); closeModal('ayah-modal');
-            const el = document.getElementById(`ayah-${selectedAyah.s}-${selectedAyah.a}`); if(el) el.classList.toggle('bookmarked');
-            showToast();
+            if(bookmarks.has(key)){
+                bookmarks.delete(key); delete bmTitles[key]; saveBookmarks();
+                closeModal('ayah-modal');
+                const el = document.getElementById(`ayah-${selectedAyah.s}-${selectedAyah.a}`); if(el) el.classList.remove('bookmarked');
+                showToast('Bookmark dihapus');
+            } else {
+                const sNameId = (SURAH_META[selectedAyah.s-1] || [])[0] || selectedAyah.n || ('Surah ' + selectedAyah.s);
+                openBookmarkNameModal('add', key, `QS. ${sNameId} · Ayat ${selectedAyah.a}`);
+            }
         }
 
         // Jadikan ayat ini sebagai "terakhir baca" (manual — kartu beranda hanya muncul utk yg di-set sengaja)
@@ -2792,29 +2950,49 @@
         // ══ GARIS MUSHAF v3 — overlay per-baris: tiap garis digambar tepat di bawah
         //    baris teks Arab yang TERUKUR nyata, jadi kebal thd surah-box, bismillah,
         //    terjemahan, wrap tak rata, maupun font fallback. ══
+        // ══ BISMILLAH FIT — ALWAYS (tidak tergantung showRules) ══
+        // Aturan: 1 BARIS aja, fit lebar kolom (like mushaf). Ukuran ion tolong
+        // biar basmalah nearly menel seluruh lebar teks (0.95x), tidak wrap.
+        function fitBismillah(tb){
+            const has = tb.querySelectorAll('.bismillah-text');
+            if(!has.length) return;
+            const cw = tb.clientWidth * 0.95;
+            if(cw < 60) return;
+            has.forEach(b => {
+                b.style.whiteSpace = 'nowrap';                // SEMPRE 1 baris
+                b.style.display = 'block'; b.style.width = '100%';
+                b.style.textAlign = 'center';
+                b.style.fontSize = '';
+                const w0 = b.getBoundingClientRect().width;
+                const fs0 = parseFloat(getComputedStyle(b).fontSize) || 26;
+                if(w0 > 4){
+                    const ratio = w0 / fs0;                   // px lebar per 1px font
+                    let fs = cw / ratio;                      // fit lebar kolom dalam 1 baris
+                    fs = Math.max(20, Math.min(160, fs));
+                    b.style.fontSize = fs + 'px';
+                    // pengaman: ukur ulang, biar tidak overflow (rounding/letter-spacing)
+                    const w1 = b.getBoundingClientRect().width;
+                    if(w1 > cw + 2 && ratio > 0){
+                        fs = Math.max(14, cw * fs / w1);
+                        b.style.fontSize = fs + 'px';
+                    }
+                }
+            });
+        }
         function calibrateRuleBlock(tb){
             if(!tb || !tb.isConnected || tb.offsetParent === null) return;
+            fitBismillah(tb);   // basmalah fit SEMPRE — indipendent dari garis mushaf
             tb.querySelectorAll('.mushaf-rule').forEach(e => e.remove());
             if(userConfig.showRules === false) return;
             tb.style.backgroundImage = 'none';
             tb.style.position = 'relative';
             tb.style.zIndex = '0';
-            // Basmalah: perbesar hingga hampir selebar kolom (maks 2.1x ukuran huruf)
-            tb.querySelectorAll('.bismillah-text').forEach(b => {
-                const cw = tb.clientWidth * 0.92;
-                if(cw < 60) return;
-                b.style.fontSize = '';
-                const w0 = b.getBoundingClientRect().width;
-                if(w0 > 4){
-                    const fs0 = parseFloat(getComputedStyle(b).fontSize) || 26;
-                    let fs = fs0 * (cw / w0);
-                    fs = Math.max(20, Math.min(userConfig.fontSize * 2.1, fs));
-                    b.style.fontSize = fs + 'px';
-                }
-            });
 
             const dfs = tb.querySelectorAll('.dynamic-font');
             if(!dfs.length) return;
+            // Effektif font-size asli dari element (preview bisa fit-shrink + slider) — supaya garis mushaf ikut teks yang terlihat
+            let effFs = userConfig.fontSize;
+            try{ const cfs = parseFloat(getComputedStyle(dfs[0]).fontSize); if(cfs > 0) effFs = cfs; }catch(e){}
             const tbTop = tb.getBoundingClientRect().top;
 
             // Ukur offset baseline dlm satu baris: probe sementara di awal teks Arab pertama
@@ -2836,7 +3014,7 @@
                 }
             } catch(e) {}
 
-            const dy = ((userConfig.ruleDy != null ? userConfig.ruleDy : 30) / 34) * userConfig.fontSize;
+            const dy = ((userConfig.ruleDy != null ? userConfig.ruleDy : 30) / 34) * effFs;
             const seen = new Set();
             const frag = document.createDocumentFragment();
             dfs.forEach(df => {
@@ -3800,10 +3978,10 @@ var STEPS = [
      body: '<b>Ketuk ayat mana pun</b> untuk membuka menu: \uD83D\uDCD6 Terjemah &amp; Tafsir, \uD83D\uDCCD Bookmark ayat, \uD83D\uDCCB Salin ayat, \uD83D\uDD0A Putar audio murattal (Misyari Rasyid), dan \uD83D\uDCCC <b>Jadikan Terakhir Baca</b> untuk memunculkan kartu Lanjutkan Membaca di beranda. Ketuk ayat lagi untuk menghapus highlight. <b>Lanjutkan</b> untuk kembali ke menu.'},
     {target: '.hero-actions button[onclick*="openBookmarkList"]',
      title: '\uD83D\uDCCD Bookmark',
-     body: 'Kumpulan ayat yang kamu tandai. <b>Ketuk bookmark</b> untuk langsung melompat ke ayat itu (presisi ke halaman yang benar). Tombol \u2715 untuk menghapus.'},
+     body: 'Kumpulan ayat yang kamu tandai — saat tambah bisa tulis <b>nama/judul custom</b>, rename lembaga ikon ✎ di daftar, dan <b>cari</b> di kotak atas (nama / surah / ayat). Ketuk utk langsung melompat ke ayat itu (presisi ke halaman yang benar). Tombol \u2715 untuk menghapus.'},
     {target: '.hero-actions button[onclick*="toggleSettings"]',
      title: '\u2699\uFE0F Pengaturan',
-     body: 'Semua pengaturan di sini: standar Rasm (IndoPak/Utsmani), perataan teks, garis & tanda mushaf, warna bantuan waqaf, <b>ukuran teks</b> + <b>\uD83D\uDD12 Kunci Ukuran Font</b> (cegah berubah saat scroll), tema (Terang/Mushaf/Gelap), unduh audio murattal (offline), posisi bar baca.'},
+     body: 'Semua pengaturan di sini: standar Rasm (IndoPak/Utsmani), perataan teks, garis & tanda mushaf, warna bantuan waqaf, <b>ukuran teks</b> + <b>\uD83D\uDD12 Kunci Ukuran Font</b> (cegah berubah saat scroll), tema (Terang/Mushaf/Gelap), unduh audio murattal (offline), posisi bar baca, dan <b>show/hide kartu beranda</b> (jadwal shalat, terakhir baca, progres tilawah).'},
     {target: '.hero-actions button[onclick*="openTutorial"]',
      title: '\u2753 Bantuan',
      body: 'Tombol <b>?</b> ini membuka kembali tutorial kapan pun kamu butuh. Tutorial juga muncul otomatis saat ada <b>pembaruan versi besar</b> aplikasi.'},
@@ -3828,35 +4006,52 @@ function ensureEl(){
     document.body.appendChild(ov);
 }
 
+var curSteps = STEPS;
+function cardHidden(sel){
+    // Setting kartu beranda (baca langsung dari localStorage — scope tutorial terpisah)
+    try{
+        var cfg = JSON.parse(localStorage.getItem('quranProConfig_v6') || '{}');
+        var v;
+        if(sel === '#prayer-card') v = cfg.showPrayerCard;
+        else if(sel === '#last-read-banner') v = cfg.showLastReadCard;
+        else if(sel === '#tilawah-card') v = cfg.showTilawahCard;
+        else return false;
+        if(v === undefined) return sel === '#last-read-banner' ? false : true; // default sama dgn userConfig: lastread shown, jadwal/tilawah hidden
+        return v === false;
+    }catch(e){}
+    return false;
+}
+function stepVisible(s){ return !cardHidden(s.target); }
+
 function showStep(){
-    var s = STEPS[cur];
+    var s = curSteps[cur];
     var dots = '';
-    for(var i=0;i<STEPS.length;i++){
+    for(var i=0;i<curSteps.length;i++){
         dots += '<span class="tc-dot' + (i===cur ? ' on' : '') + '"></span>';
     }
     card.innerHTML =
         '<div class="tc-title">' + s.title + '</div>' +
         '<div class="tc-body">' + s.body + '</div>' +
-        '<div class="tc-step">Langkah ' + (cur+1) + ' / ' + STEPS.length + '</div>' +
+        '<div class="tc-step">Langkah ' + (cur+1) + ' / ' + curSteps.length + '</div>' +
         '<div class="tc-dots">' + dots + '</div>' +
         '<div class="tc-btns">' +
             (cur > 0 ? '<button class="tc-btn ghost" id="t-prev">\u2190</button>' : '') +
             '<button class="tc-btn ghost" id="t-skip">Lewati</button>' +
             '<button class="tc-btn spacer"></button>' +
             '<button class="tc-btn primary" id="t-next">' +
-                (cur === STEPS.length-1 ? 'Selesai' : 'Berikutnya') + '</button>' +
+                (cur === curSteps.length-1 ? 'Selesai' : 'Berikutnya') + '</button>' +
         '</div>';
     document.getElementById('t-skip').onclick = finish;
     var nxt = document.getElementById('t-next');
     nxt.onclick = function(){
-        if(cur === STEPS.length-1){ finish(); return; }
+        if(cur === curSteps.length-1){ finish(); return; }
         cur++; showStep();
     };
     var prv = document.getElementById('t-prev');
     if(prv) prv.onclick = function(){ cur--; showStep(); };
 
     // keluar dari mode demo -> tutup reader biar menu terlihat
-    var prev = (cur > 0) ? STEPS[cur-1] : null;
+    var prev = (cur > 0) ? curSteps[cur-1] : null;
     if(prev && prev.demo && !s.demo) closeDemoReader();
 
     // masuk mode demo -> buka sample ayat
@@ -3940,6 +4135,8 @@ function finish(){
 function openTutorial(){
     ensureEl();
     cur = 0;
+    // Filter step kartu beranda yang sedang hidden (jadwal/progres/terakhir baca)
+    curSteps = STEPS.filter(function(s){ return stepVisible(s); });
     closeDemoReader();   // mulai dari menu (hero) biar langkah pertama terlihat
     ov.classList.add('show');
     showStep();

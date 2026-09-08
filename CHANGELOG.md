@@ -1,5 +1,37 @@
 # Changelog — Al-Qur'an Digital
 
+## v3.7.0 (Saptember 2026)
+
+- **Fitur: show/hide kartu beranda (Pengaturan).** Tiga kartu di beranda kini bisa
+  ditampilkan/dihapus dari **Pengaturan → group "Kartu Beranda"**: **🕌 Jadwal
+  Shalat**, **📖 Terakhir Baca (Lanjutkan Bacaan)**, dan **📈 Progres Tilawah**.
+  Setting tersimpan di config lokal (`quranProConfig_v6`), ganti berlaku instan.
+  **Default**: Jadwal Shalat & Progres Tilawah **hidden**, Terakhir Baca **show**
+  (beranda lebih bersih/ringkas).
+- **Tutorial adaptif.** Langkah tutorial yang menunjuk kartu beranda yang sedang
+  hidden otomatis di-skip, sehingga tour tidak lagi menunjuk kartu tidak terlihat.
+- **Bookmark: nama custom + pencarian.** Saat tambah bookmark kini bisa langsung
+  tulis **nama/judul custom** (modal "🖊️ Nama Bookmark", pre-fill nama surah,
+  max 60 karakter; kosong = pakai nama surah). Bookmark lama tetap kompatibel.
+  Di daftar **Bookmark** tersedia kotak **pencarian** (filter oleh nama custom /
+  nama surah / nomor ayat) + tombol **✎ rename** per bookmark (re-save di modal
+  nama) — semua data tersimpan di localStorage (`quranProBookmarkTitles`).
+- **Preview teks: ukuran real + compacto.** Di Pengaturan, area preview tampil
+  **ukuran asli** selalu (ikut slider, tidak ada auto-shrink) dengan **tinggi fix
+  180px** (biar hemat tempat) — grabber ↕ bisa digeser **180–360px** (2× tinggi
+  default; ukuran tersimpan & di-restore). Saat teks lewat box (font besar) →
+  **scroll vertical**. **Label ukuran** di header tampil ukuran real + "↓ scroll"
+  bila lewat; label "Preview (QS...)" dihapus (tidak perlu). Garis mushaf ikut
+  ukuran efektif teks.
+- **Fix: basmalah fit lebar kolom, 1 baris.** Sebelumnya basmalah tamapil kecil
+  fix atau wrap 2 garis. Kini `fitBismillah()` jalan **ALWAYS** (tidak tergantung
+  showRules) dan menjadikan basmalah **1 baris aja** (`white-space: nowrap`) yang
+  fit hampir seluruh lebar kolom teks (0.95x) — sedangkan `2100%` ukuran alami
+  seperti mushaf. Aturan surah: tetap tampil biar semua surah **bukan** 1
+  (Al-Fatihah) & 9 (At-Tawbah) — konvensi mushaf.
+- **Logo app diganti.** `resources/icon.png` (ikon launcher APK) kini memakai
+  `resources/logo baru.png` — build APK berikutnya ikut ikon baru.
+
 ## v3.6.1 (Agustus 2026)
 
 - **Fitur "Unduh teks" dihapus (redundan).** Teks Al-Qur'an (Utsmani +
