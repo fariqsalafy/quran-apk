@@ -1797,6 +1797,11 @@
             document.documentElement.style.setProperty('--arabic-font-size', v + 'px');
             const pb = document.getElementById('preview-box');
             if (pb){ pb.style.fontSize = v + 'px'; requestAnimationFrame(fitPreviewText); }
+            // kalibrasi ulang basmalah & garis mushaf di halaman bacaan (debounce saat slider digeser)
+            clearTimeout(window._fsRefit);
+            window._fsRefit = setTimeout(function(){
+                if(typeof redrawAllRuledLines === 'function') redrawAllRuledLines();
+            }, 150);
         }
 
         function setMode(m){
@@ -2951,31 +2956,48 @@
         //    baris teks Arab yang TERUKUR nyata, jadi kebal thd surah-box, bismillah,
         //    terjemahan, wrap tak rata, maupun font fallback. ══
         // ══ BISMILLAH FIT — ALWAYS (tidak tergantung showRules) ══
-        // Aturan: 1 BARIS aja, fit lebar kolom (like mushaf). Ukuran ion tolong
-        // biar basmalah nearly menel seluruh lebar teks (0.95x), tidak wrap.
+        // Aturan: SELALU 1 baris (nowrap) & selebar maksimal kolom (~94% isi kolom).
+        // Dulu bug: teks diukur lewat getBoundingClientRect pada box width:100%
+        // → lebar yg terukur selalu sama dgn lebar kolom (bukan lebar teks asli)
+        // → hasil fit jadi KONSTAN ≈ 0.9x ukuran dasar (2.1rem) — kebesaran saat
+        //   font ayat kecil, kekecilan/tak penuh 1 baris saat font besar.
+        // Fix: ukur lebar runtutan sebenarnya via Range API + kolom dibersihkan
+        // dari padding, lalu skala font linear biar penuh 1 baris (mushaf).
+        function textWidth(el){
+            if(!el.firstChild) return 0;
+            const rr = document.createRange();
+            rr.selectNodeContents(el);
+            let w = 0;
+            for(const r of rr.getClientRects()) if(r.width > w) w = r.width;
+            if(rr.detach) rr.detach();
+            return w;
+        }
         function fitBismillah(tb){
             const has = tb.querySelectorAll('.bismillah-text');
             if(!has.length) return;
-            const cw = tb.clientWidth * 0.95;
-            if(cw < 60) return;
             has.forEach(b => {
-                b.style.whiteSpace = 'nowrap';                // SEMPRE 1 baris
-                b.style.display = 'block'; b.style.width = '100%';
-                b.style.textAlign = 'center';
-                b.style.fontSize = '';
-                const w0 = b.getBoundingClientRect().width;
+                const par = b.parentElement;                       // .bismillah-container
+                let avail = tb.clientWidth * 0.8;                  // fallback bila par tak ada
+                if(par){
+                    const pcs = getComputedStyle(par);
+                    avail = par.clientWidth - (parseFloat(pcs.paddingLeft) || 0)
+                                          - (parseFloat(pcs.paddingRight) || 0);
+                }
+                if(avail < 60) return;                             // kolom terlalu sempit
+                const target = avail * 0.94;                       // isi baris maksimal, ada napas tepi
+                b.style.whiteSpace = 'nowrap';                     // 1 baris SELALU
+                b.style.fontSize = '';                             // reset ke ukuran dasar CSS
+                const w0 = textWidth(b);                           // lebar teks ASLI (bukan lebar box)
+                if(w0 < 4) return;
                 const fs0 = parseFloat(getComputedStyle(b).fontSize) || 26;
-                if(w0 > 4){
-                    const ratio = w0 / fs0;                   // px lebar per 1px font
-                    let fs = cw / ratio;                      // fit lebar kolom dalam 1 baris
-                    fs = Math.max(20, Math.min(160, fs));
+                let fs = Math.max(12, Math.min(150, fs0 * target / w0));
+                b.style.fontSize = fs + 'px';
+                // pengaman: ukur ulang dgn ukuran baru; mengecil bila masih meluber
+                for(let i = 0; i < 2; i++){
+                    const w1 = textWidth(b);
+                    if(w1 <= avail + 1) break;
+                    fs = Math.max(11, fs * target / w1);
                     b.style.fontSize = fs + 'px';
-                    // pengaman: ukur ulang, biar tidak overflow (rounding/letter-spacing)
-                    const w1 = b.getBoundingClientRect().width;
-                    if(w1 > cw + 2 && ratio > 0){
-                        fs = Math.max(14, cw * fs / w1);
-                        b.style.fontSize = fs + 'px';
-                    }
                 }
             });
         }
